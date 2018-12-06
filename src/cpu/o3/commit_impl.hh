@@ -49,8 +49,9 @@
 #include <string>
 
 #include "arch/utility.hh"
-#include "base/loader/symtab.hh"
 #include "base/cp_annotate.hh"
+#include "base/loader/symtab.hh"
+#include "base/logging.hh"
 #include "config/the_isa.hh"
 #include "cpu/checker/cpu.hh"
 #include "cpu/o3/commit.hh"
@@ -127,21 +128,23 @@ DefaultCommit<Impl>::DefaultCommit(O3CPU *_cpu, DerivO3CPUParams *params)
 
         DPRINTF(Commit,"Commit Policy set to Oldest Ready.");
     } else {
-        assert(0 && "Invalid SMT Commit Policy. Options Are: {Aggressive,"
-               "RoundRobin,OldestReady}");
+        panic("Invalid SMT commit policy. Options are: Aggressive, "
+               "RoundRobin, OldestReady");
     }
 
-    for (ThreadID tid = 0; tid < numThreads; tid++) {
+    for (ThreadID tid = 0; tid < Impl::MaxThreads; tid++) {
         commitStatus[tid] = Idle;
         changedROBNumEntries[tid] = false;
-        checkEmptyROB[tid] = false;
-        trapInFlight[tid] = false;
-        committedStores[tid] = false;
         trapSquash[tid] = false;
         tcSquash[tid] = false;
+        squashAfterInst[tid] = nullptr;
         pc[tid].set(0);
+        youngestSeqNum[tid] = 0;
         lastCommitedSeqNum[tid] = 0;
-        squashAfterInst[tid] = NULL;
+        trapInFlight[tid] = false;
+        committedStores[tid] = false;
+        checkEmptyROB[tid] = false;
+        renameMap[tid] = nullptr;
     }
     interrupt = NoFault;
 }

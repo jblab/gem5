@@ -48,6 +48,7 @@
 #include <limits>
 #include <vector>
 
+#include "base/logging.hh"
 #include "cpu/o3/fu_pool.hh"
 #include "cpu/o3/inst_queue.hh"
 #include "debug/IQ.hh"
@@ -112,7 +113,7 @@ InstructionQueue<Impl>::InstructionQueue(O3CPU *cpu_ptr, IEW *iew_ptr,
     regScoreboard.resize(numPhysRegs);
 
     //Initialize Mem Dependence Units
-    for (ThreadID tid = 0; tid < numThreads; tid++) {
+    for (ThreadID tid = 0; tid < Impl::MaxThreads; tid++) {
         memDepUnit[tid].init(params, tid);
         memDepUnit[tid].setIQ(this);
     }
@@ -162,9 +163,12 @@ InstructionQueue<Impl>::InstructionQueue(O3CPU *cpu_ptr, IEW *iew_ptr,
         DPRINTF(IQ, "IQ sharing policy set to Threshold:"
                 "%i entries per thread.\n",thresholdIQ);
    } else {
-       assert(0 && "Invalid IQ Sharing Policy.Options Are:{Dynamic,"
-              "Partitioned, Threshold}");
+       panic("Invalid IQ sharing policy. Options are: Dynamic, "
+              "Partitioned, Threshold");
    }
+    for (ThreadID tid = numThreads; tid < Impl::MaxThreads; tid++) {
+        maxEntries[tid] = 0;
+    }
 }
 
 template <class Impl>
@@ -406,7 +410,7 @@ void
 InstructionQueue<Impl>::resetState()
 {
     //Initialize thread IQ counts
-    for (ThreadID tid = 0; tid <numThreads; tid++) {
+    for (ThreadID tid = 0; tid < Impl::MaxThreads; tid++) {
         count[tid] = 0;
         instList[tid].clear();
     }
@@ -423,7 +427,7 @@ InstructionQueue<Impl>::resetState()
         regScoreboard[i] = false;
     }
 
-    for (ThreadID tid = 0; tid < numThreads; ++tid) {
+    for (ThreadID tid = 0; tid < Impl::MaxThreads; ++tid) {
         squashedSeqNum[tid] = 0;
     }
 
