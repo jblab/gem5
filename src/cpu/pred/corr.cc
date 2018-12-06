@@ -2,7 +2,6 @@
 
 #include "base/bitfield.hh"
 #include "base/intmath.hh"
-#include "base/misc.hh"
 #include "base/trace.hh"
 #include "cpu/pred/corr.hh"
 #include "debug/Fetch.hh"
