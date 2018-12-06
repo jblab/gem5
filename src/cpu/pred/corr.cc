@@ -7,7 +7,7 @@
 #include "debug/Fetch.hh"
 
 corrBP::corrBP(const Params *params ):BPredUnit(params),
-InstShiftAmt(params->InstShiftAmt)
+InstShiftAmt(params->instShiftAmt)
 
 {
 
@@ -138,7 +138,7 @@ if (bp_history) {
 
         index=historytable[branch_lower_order];
         count=countertable[index];
-        if ((count>=0) & (count<3))
+        if (count<3)
         count++;
         countertable[index]=count;
 
@@ -224,7 +224,7 @@ corrBP::uncondBranch(void *&bp_history,Addr branch_addr)
 
         index=historytable[branch_lower_order];
         count=countertable[index];
-        if ((count>=0) & (count<3))
+        if (count<3)
         count++;
         countertable[index]=count;
 
