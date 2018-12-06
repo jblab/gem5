@@ -87,6 +87,11 @@ class BiModeBP(BranchPredictor):
     choicePredictorSize = Param.Unsigned(8192, "Size of choice predictor")
     choiceCtrBits = Param.Unsigned(2, "Bits of choice counters")
 
+class CorrBP(BranchPredictor):
+    type = 'CorrBP'
+    cxx_class = 'CorrBP'
+    cxx_header = "cpu/pred/corr.hh"
+
 # TAGE branch predictor as described in https://www.jilp.org/vol8/v8paper1.pdf
 # The default sizes below are for the 8C-TAGE configuration (63.5 Kbits)
 class TAGE(BranchPredictor):
