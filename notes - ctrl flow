@@ -1,0 +1,40 @@
+
+src/sim/main.cc -> m5Main(argc, argv);
+
+src/sim/init.cc:m5Main -> PyRun_String(*command, Py_file_input, dict, dict);
+
+src/python/m5/main.py:main(*args) -- 
+
+filecode = compile(filedata, filename, 'exec')
+
+exec filecode in scope -> se.py
+
+se.py -> Simulation.run(options, root, system, FutureClass)
+
+configs/common/Simulation.py:run(options, root, system, FutureClass) -> m5.instantiate(checkpoint_dir)
+
+src/python/m5/simulate.py:instantiate(ckpt_dir=None) -> 
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------
+Notes:
+
+The basic order of C++ SimObject construction and initialization is controlled by the instantiate() and simulate() Python functions in src/python/m5/simulate.py. Once the Python SimObject hierarchy is created by the user's simulation script, that script calls instantiate() to create the C++ equivalent of that hierarchy. Primary steps in this process are:
+1. Resolve the proxy parameters (those specified using Self and Parent).
+2. Dump the config.ini file to record the final resolved set of SimObjects and parameter values.
+3. Call the C++ constructors for all the SimObjects. These constructors are called in an order that satisfies parameter dependencies, i.e., if object A is passed as a parameter to object B, then object A's constructor will be called before object B's constructor so that the C++ pointer to A can be passed to B's constructor. Note that this policy means that cyclic parameter dependencies cannot be supported.
+4. Instantiate the memory-system port connections. In the case of restoring from a checkpoint, not all ports are connected at this stage, i.e., the switch CPU(s) are not connected.
+5. Call init() on each SimObject. This provides the first opportunity to perform initializations that depend on all SimObjects being fully constructed. 
+6. Call regStats() on each SimObject.
+
+http://www.gem5.org/SimObjects
+
+SimObject > All objects in gem5 inherit from base SimObject type. It exports main interfaces to all objects in gem5. SimObjects are wrapped C++ objects that are accessible from Python configuration scripts.
+
+Contribute to Gem5
+https://gem5.googlesource.com/public/gem5/+/master/CONTRIBUTING.md
