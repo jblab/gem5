@@ -33,7 +33,7 @@ InstShiftAmt(params->instShiftAmt)
 
 // reset function
 
-void CorrBP:: reset() {
+void CorrBP::reset() {
 
 
    for (int i=0; i<16;i++)
@@ -93,7 +93,7 @@ CorrBP::updateGlobalHistNotTaken(unsigned branch_lower_order)
 
 // lookup
 
-bool CorrBP:: lookup(Addr branch_addr, void * &bp_history ){
+bool CorrBP::lookup(Addr branch_addr, void * &bp_history ){
 
 bool taken=0;
 
@@ -124,7 +124,7 @@ return taken;
 
 // update
 void
-CorrBP:: update(Addr branch_addr,
+CorrBP::update(Addr branch_addr,
   bool taken, void *bp_history, bool squashed ){
 
 
