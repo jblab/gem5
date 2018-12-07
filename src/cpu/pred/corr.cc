@@ -6,7 +6,7 @@
 #include "cpu/pred/corr.hh"
 #include "debug/Fetch.hh"
 
-CorrBP::CorrBP(const Params *params ):BPredUnit(params),
+CorrBP::CorrBP(const CorrBPParams *params ):BPredUnit(params),
 InstShiftAmt(params->instShiftAmt)
 
 {
