@@ -10,6 +10,7 @@
 #include "cpu/pred/bpred_unit.hh"
 #include "cpu/pred/file.hh"
 #include "cpu/pred/sat_counter.hh"
+#include "params/CorrBP.hh"
 
 using namespace std;
 

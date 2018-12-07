@@ -88,6 +88,7 @@ class BiModeBP(BranchPredictor):
     choiceCtrBits = Param.Unsigned(2, "Bits of choice counters")
 
 class CorrBP(BranchPredictor):
+    type = 'CorrBP'
     cxx_class = 'CorrBP'
     cxx_header = "cpu/pred/corr.hh"
 
