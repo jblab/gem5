@@ -21,7 +21,7 @@ public:
 
 CorrBP(const Params *params );    // constructor
 
-~CorrBP(void);
+//~CorrBP(void);
 
 unsigned calcLocHistIdx(Addr &branch_addr);
 
