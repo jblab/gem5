@@ -28,16 +28,17 @@ unsigned calcLocHistIdx(Addr &branch_addr);
 void uncondBranch(ThreadID tid, Addr pc, void * &bp_history);
 
 /* looks up the branch address in the bp_history table*/
-bool lookup(Addr branch_addr, void * &bp_history);
+bool lookup(ThreadID tid, Addr branch_addr, void * &bp_history);
 
-void btbUpdate(Addr branch_addr, void * &bp_history);
+void btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history);
 
 /* updates the branch address as taken,
 not taken or squashed in the bp_history table*/
-void update(Addr branch_addr, bool taken, void *bp_history, bool squashed);
+void update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history,
+                bool squashed);
 
 
- void squash(void *bp_history);
+ void squash(ThreadID tid, void *bp_history);
 
  void squash2(Addr &branch_addr);
 

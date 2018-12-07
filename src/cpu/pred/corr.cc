@@ -93,7 +93,7 @@ CorrBP::updateGlobalHistNotTaken(unsigned branch_lower_order)
 
 // lookup
 
-bool CorrBP::lookup(Addr branch_addr, void * &bp_history ){
+bool CorrBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history){
 
 bool taken=0;
 
@@ -124,8 +124,8 @@ return taken;
 
 // update
 void
-CorrBP::update(Addr branch_addr,
-  bool taken, void *bp_history, bool squashed ){
+CorrBP::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history,
+                bool squashed){
 
 
    branch_lower_order = calcLocHistIdx(branch_addr);
@@ -176,7 +176,7 @@ DPRINTF(Fetch, "update complete\n");
 
 
 void
-CorrBP::btbUpdate(Addr branch_addr, void * &bp_history)
+CorrBP::btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
 // Place holder for a function that is called to update predictor history when
 // a BTB entry is invalid or not found.
@@ -239,7 +239,7 @@ CorrBP::uncondBranch(ThreadID tid,Addr branch_addr,void *&bp_history)
 
 
 void
-CorrBP::squash(void *bp_history){
+CorrBP::squash(ThreadID tid, void *bp_history){
 
 DPRINTF(Fetch, "squash\n");
   //  updateGlobalHistNotTaken();
