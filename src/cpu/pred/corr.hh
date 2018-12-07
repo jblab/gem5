@@ -14,14 +14,14 @@
 
 using namespace std;
 
-class corrBP : public BPredUnit
+class CorrBP : public BPredUnit
 {
 
 public:
 
-corrBP(const Params *params );    // constructor
+CorrBP(const Params *params );    // constructor
 
-~corrBP(void);
+~CorrBP(void);
 
 unsigned calcLocHistIdx(Addr &branch_addr);
 
