@@ -19,7 +19,7 @@ class CorrBP : public BPredUnit
 
 public:
 
-CorrBP(const Params *params );    // constructor
+CorrBP(const CorrBPParams *params );    // constructor
 
 ~CorrBP(void);
 

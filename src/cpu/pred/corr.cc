@@ -274,7 +274,7 @@ CorrBP::squash2(Addr &branch_addr){
 CorrBP*
 CorrBPParams::create()
 {
-    return new CorrBP::CorrBP(this);
+    return new CorrBP(this);
 }
 
 CorrBP:: ~ CorrBP (void){
