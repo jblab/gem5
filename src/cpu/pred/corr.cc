@@ -6,7 +6,7 @@
 #include "cpu/pred/corr.hh"
 #include "debug/Fetch.hh"
 
-corrBP::corrBP(const Params *params ):BPredUnit(params),
+CorrBP::CorrBP(const Params *params ):BPredUnit(params),
 InstShiftAmt(params->instShiftAmt)
 
 {
@@ -33,7 +33,7 @@ InstShiftAmt(params->instShiftAmt)
 
 // reset function
 
-void corrBP:: reset() {
+void CorrBP:: reset() {
 
 
    for (int i=0; i<16;i++)
@@ -56,7 +56,7 @@ void corrBP:: reset() {
 
 inline
 unsigned
-corrBP::calcLocHistIdx(Addr &branch_addr)
+CorrBP::calcLocHistIdx(Addr &branch_addr)
 {
     // Get low order bits after removing instruction offset.
     return (branch_addr >> InstShiftAmt) & (15);
@@ -64,7 +64,7 @@ corrBP::calcLocHistIdx(Addr &branch_addr)
 
 inline
 void
-corrBP::updateGlobalHistTaken(unsigned branch_lower_order)
+CorrBP::updateGlobalHistTaken(unsigned branch_lower_order)
 {
    historytable[branch_lower_order]=(historytable[branch_lower_order] <<1) | 1;
    historytable[branch_lower_order]=(historytable[branch_lower_order] & 15);
@@ -78,7 +78,7 @@ corrBP::updateGlobalHistTaken(unsigned branch_lower_order)
 
 inline
 void
-corrBP::updateGlobalHistNotTaken(unsigned branch_lower_order)
+CorrBP::updateGlobalHistNotTaken(unsigned branch_lower_order)
 {
    historytable[branch_lower_order]=(historytable[branch_lower_order] <<1) ;
    historytable[branch_lower_order]=(historytable[branch_lower_order] & 15);
@@ -93,7 +93,7 @@ corrBP::updateGlobalHistNotTaken(unsigned branch_lower_order)
 
 // lookup
 
-bool corrBP:: lookup(Addr branch_addr, void * &bp_history ){
+bool CorrBP:: lookup(Addr branch_addr, void * &bp_history ){
 
 bool taken=0;
 
@@ -124,7 +124,7 @@ return taken;
 
 // update
 void
-corrBP:: update(Addr branch_addr,
+CorrBP:: update(Addr branch_addr,
   bool taken, void *bp_history, bool squashed ){
 
 
@@ -176,7 +176,7 @@ DPRINTF(Fetch, "update complete\n");
 
 
 void
-corrBP::btbUpdate(Addr branch_addr, void * &bp_history)
+CorrBP::btbUpdate(Addr branch_addr, void * &bp_history)
 {
 // Place holder for a function that is called to update predictor history when
 // a BTB entry is invalid or not found.
@@ -211,7 +211,7 @@ fl.log(msg);
 
 
 void
-corrBP::uncondBranch(void *&bp_history,Addr branch_addr)
+CorrBP::uncondBranch(void *&bp_history,Addr branch_addr)
 {
 
 // Create BPHistory and pass it back to be recorded.
@@ -239,7 +239,7 @@ corrBP::uncondBranch(void *&bp_history,Addr branch_addr)
 
 
 void
-corrBP::squash(void *bp_history){
+CorrBP::squash(void *bp_history){
 
 DPRINTF(Fetch, "squash\n");
   //  updateGlobalHistNotTaken();
@@ -255,7 +255,7 @@ DPRINTF(Fetch, "squash\n");
 }
 
 void
-corrBP::squash2(Addr &branch_addr){
+CorrBP::squash2(Addr &branch_addr){
 
 
      branch_lower_order = calcLocHistIdx(branch_addr);
@@ -271,7 +271,7 @@ corrBP::squash2(Addr &branch_addr){
 
 }
 
-corrBP:: ~ corrBP (void){
+CorrBP:: ~ CorrBP (void){
 
 
 sprintf (msg , " destructor");
@@ -285,5 +285,5 @@ fl.closelog();
 
 #ifdef DEBUG
 int
-corrBP::BPHistory::newCount = 0;
+CorrBP::BPHistory::newCount = 0;
 #endif
