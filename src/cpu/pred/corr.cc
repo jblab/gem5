@@ -211,7 +211,7 @@ fl.log(msg);
 
 
 void
-CorrBP::uncondBranch(void *&bp_history,Addr branch_addr)
+CorrBP::uncondBranch(ThreadID tid,Addr branch_addr,void *&bp_history)
 {
 
 // Create BPHistory and pass it back to be recorded.

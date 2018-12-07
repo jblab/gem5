@@ -25,7 +25,7 @@ CorrBP(const CorrBPParams *params );    // constructor
 
 unsigned calcLocHistIdx(Addr &branch_addr);
 
-void uncondBranch(void * &bp_history,Addr branch_addr);
+void uncondBranch(ThreadID tid, Addr pc, void * &bp_history);
 
 /* looks up the branch address in the bp_history table*/
 bool lookup(Addr branch_addr, void * &bp_history);
