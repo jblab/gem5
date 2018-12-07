@@ -277,7 +277,7 @@ CorrBPParams::create()
     return new CorrBP(this);
 }
 
-CorrBP:: ~ CorrBP (void){
+/*CorrBP:: ~ CorrBP (void){
 
 
 sprintf (msg , " destructor");
@@ -286,7 +286,7 @@ fl.log(msg);
 fl.closelog();
 
 
-}
+}*/
 
 
 #ifdef DEBUG
