@@ -276,7 +276,7 @@ CorrBPParams::create()
 {
     return new CorrBP(this);
 }
-
+/*
 CorrBP:: ~ CorrBP (void){
 
 
@@ -287,7 +287,7 @@ fl.closelog();
 
 
 }
-
+*/
 
 #ifdef DEBUG
 int
