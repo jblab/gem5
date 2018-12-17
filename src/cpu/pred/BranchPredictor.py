@@ -92,6 +92,11 @@ class CorrBP(BranchPredictor):
     cxx_class = 'CorrBP'
     cxx_header = "cpu/pred/corr.hh"
 
+class PerceptronBP(BranchPredictor):
+    type = 'PerceptronBP_Top'
+    cxx_class = 'PerceptronBP_Top'
+    cxx_header = "cpu/pred/perceptron_top.hh"
+
 # TAGE branch predictor as described in https://www.jilp.org/vol8/v8paper1.pdf
 # The default sizes below are for the 8C-TAGE configuration (63.5 Kbits)
 class TAGE(BranchPredictor):
