@@ -10,6 +10,7 @@
 #include "base/types.hh"
 //#include "cpu/o3/sat_counter.hh"
 #include "cpu/pred/perceptron.hh"
+#include "cpu/pred/bpred_unit.hh"
 
 /**
  * Implements a global predictor that uses the PC to index into a table of
@@ -18,7 +19,7 @@
  * predictor state that needs to be recorded or updated; the update can be
  * determined solely by the branch being taken or not taken.
  */
-class PerceptronBP_Top
+class PerceptronBP_Top : BPredUnit
 {
   public:
     /**
