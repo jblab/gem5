@@ -4,14 +4,14 @@
 
 #include "base/intmath.hh"
 #include "base/trace.hh"
-#include "debug/Perceptron.hh"
+#include "debug/Fetch.hh"
 #include "cpu/pred/perceptron.hh"
 #include "cpu/pred/perceptron_top.hh"
 
 PerceptronBP_Top::PerceptronBP_Top(unsigned globalPredictorSize, unsigned globalHistBits, int32_t theta)
 {
 
-  DPRINTF(Perceptron, "BP_Top Constructor Start %d %d %d\n", globalPredictorSize, globalHistBits, theta);
+  DPRINTF(Fetch, "BP_Top Constructor Start %d %d %d\n", globalPredictorSize, globalHistBits, theta);
 	this->globalPredictorSize = floorPow2(globalPredictorSize/(globalHistBits * ceilLog2(theta)));
 	this->globalHistBits = globalHistBits;
 
@@ -32,7 +32,7 @@ PerceptronBP_Top::PerceptronBP_Top(unsigned globalPredictorSize, unsigned global
 	this->globalHistoryMask = (unsigned)(power(2,globalHistBits) - 1);
 
 	this->theta = theta;
-  DPRINTF(Perceptron, "BP_Top Constructed %d %d %d %d\n", this->globalPredictorSize, this->globalHistBits, this->theta, this->globalHistoryMask);
+  DPRINTF(Fetch, "BP_Top Constructed %d %d %d %d\n", this->globalPredictorSize, this->globalHistBits, this->theta, this->globalHistoryMask);
 
   this->missCount = 0;
 }
@@ -40,7 +40,7 @@ PerceptronBP_Top::PerceptronBP_Top(unsigned globalPredictorSize, unsigned global
 bool
 PerceptronBP_Top::lookup(ThreadID tid, Addr &branch_addr, void * &bp_history)
 {
-  DPRINTF(Perceptron, "BP_Top entered lookup\n");
+  DPRINTF(Fetch, "BP_Top entered lookup\n");
 	//PerceptronBP* curr_perceptron = this->perceptronTable[ (branch_addr >> 2) & this->globalHistoryMask];
 	PerceptronBP* curr_perceptron = this->perceptronTable[ (branch_addr >> 2) & (this->globalPredictorSize - 1)];
 	BPHistory *history = new BPHistory;
@@ -49,8 +49,8 @@ PerceptronBP_Top::lookup(ThreadID tid, Addr &branch_addr, void * &bp_history)
 	bp_history = static_cast<void *>(history);
 
 	// y 
-  DPRINTF(Perceptron, "BP_Top lookup y: %d\n", history->perceptron_y);
-  DPRINTF(Perceptron, "BP_Top branch_addr %x\n", branch_addr);
+  DPRINTF(Fetch, "BP_Top lookup y: %d\n", history->perceptron_y);
+  DPRINTF(Fetch, "BP_Top branch_addr %x\n", branch_addr);
 	return (history->perceptron_y) >= 0;
 
 }
@@ -65,7 +65,7 @@ void
 PerceptronBP_Top::update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_history)
 {
   BPHistory *history;
-  DPRINTF(Perceptron, "BP_Top entered update, yhist %d\n",  static_cast<BPHistory *>(bp_history)->perceptron_y);
+  DPRINTF(Fetch, "BP_Top entered update, yhist %d\n",  static_cast<BPHistory *>(bp_history)->perceptron_y);
 
   if (bp_history){
     history = static_cast<BPHistory *>(bp_history);
@@ -75,13 +75,13 @@ PerceptronBP_Top::update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_h
     this->X.insert(this->X.begin() + 1, this->changeToPlusMinusOne((int32_t)taken));
     this->X.pop_back();
     
-    DPRINTF(Perceptron, "BP_Top update after train %d\n", curr_perceptron->getPrediction(this->X)); //static_cast<BPHistory *>(bp_history)->perceptron_y);
-    DPRINTF(Perceptron, "BP_Top update taken %d\n", taken);
-    DPRINTF(Perceptron, "BP_Top update branch_addr %x\n", branch_addr);
+    DPRINTF(Fetch, "BP_Top update after train %d\n", curr_perceptron->getPrediction(this->X)); //static_cast<BPHistory *>(bp_history)->perceptron_y);
+    DPRINTF(Fetch, "BP_Top update taken %d\n", taken);
+    DPRINTF(Fetch, "BP_Top update branch_addr %x\n", branch_addr);
 
     if (taken != (history->perceptron_y > 0)){
       this->missCount++;
-      DPRINTF(Perceptron, "Miss Count: %d\n", this->missCount);
+      DPRINTF(Fetch, "Miss Count: %d\n", this->missCount);
     }
 
     delete history;
@@ -92,7 +92,7 @@ PerceptronBP_Top::update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_h
 void
 PerceptronBP_Top::squash(ThreadID tid, void *bp_history)
 {
-    DPRINTF(Perceptron, "BP_Top entered squash\n");
+    DPRINTF(Fetch, "BP_Top entered squash\n");
     BPHistory *history = static_cast<BPHistory *>(bp_history);
 
     // Delete this BPHistory now that we're done with it.

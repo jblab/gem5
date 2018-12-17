@@ -1,8 +1,7 @@
 #include "base/intmath.hh"
-#include "base/misc.hh"
 #include "base/trace.hh"
 #include "cpu/pred/perceptron.hh"
-#include "debug/Perceptron.hh"
+#include "debug/Fetch.hh"
 #include <numeric>
 #include <string>
 
@@ -44,7 +43,7 @@ PerceptronBP::reset()
 
     // fills W with 0's from [begin, end)
     std::fill(this->W.begin(), this->W.end(), 0);
-    DPRINTF(Perceptron, "Reset PerceptronBP");
+    DPRINTF(Fetch, "Reset PerceptronBP");
 }
 
 
@@ -52,7 +51,7 @@ void
 PerceptronBP::train(int8_t branch_outcome, int32_t perceptron_output, int32_t training_threshold, std::vector<int8_t> &X)
 {
     std::string s = "W: ";
-    DPRINTF(Perceptron, "Perceptron train entered\n");
+    DPRINTF(Fetch, "Perceptron train entered\n");
     if (this->changeToPlusMinusOne(perceptron_output) != branch_outcome || abs(perceptron_output)<=training_threshold) {//incorrect perceptron prediction. Upgrade the perceptron predictor
         for(int i=0; i< this->W.size(); i++) {
             W[i]= W[i]+ branch_outcome * X[i]; //Increase or decrease weight vectors
@@ -68,7 +67,7 @@ PerceptronBP::train(int8_t branch_outcome, int32_t perceptron_output, int32_t tr
             s.append(", ");
         }
     }
-    DPRINTF(Perceptron, "%s\n", s);
+    DPRINTF(Fetch, "%s\n", s);
 }
 
 inline int8_t
