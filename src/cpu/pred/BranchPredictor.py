@@ -92,7 +92,7 @@ class CorrBP(BranchPredictor):
     cxx_class = 'CorrBP'
     cxx_header = "cpu/pred/corr.hh"
 
-class PerceptronBP(BranchPredictor):
+class PerceptronBP_Top(BranchPredictor):
     type = 'PerceptronBP_Top'
     cxx_class = 'PerceptronBP_Top'
     cxx_header = "cpu/pred/perceptron_top.hh"

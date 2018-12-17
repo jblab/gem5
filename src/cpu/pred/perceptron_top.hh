@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "base/types.hh"
-#include "cpu/o3/sat_counter.hh"
+//#include "cpu/o3/sat_counter.hh"
 #include "cpu/pred/perceptron.hh"
 
 /**
