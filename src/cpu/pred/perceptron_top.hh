@@ -19,7 +19,7 @@
  * predictor state that needs to be recorded or updated; the update can be
  * determined solely by the branch being taken or not taken.
  */
-class PerceptronBP_Top : BPredUnit
+class PerceptronBP_Top : public BPredUnit
 {
   public:
     /**
@@ -27,7 +27,7 @@ class PerceptronBP_Top : BPredUnit
      * @param globalPredictorSize number of perceptrons.
      * @param globalHistBits Number of bits in global history register.
      */
-    PerceptronBP_Top(unsigned globalPredictorSize, unsigned globalHistBits, int32_t theta);
+    PerceptronBP_Top(const PerceptronBP_TopParams *params );
 
     /**
      * Looks up the given address in the branch predictor and returns

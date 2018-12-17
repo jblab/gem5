@@ -8,9 +8,11 @@
 #include "cpu/pred/perceptron.hh"
 #include "cpu/pred/perceptron_top.hh"
 
-PerceptronBP_Top::PerceptronBP_Top(unsigned globalPredictorSize, unsigned globalHistBits, int32_t theta)
+PerceptronBP_Top::PerceptronBP_Top(const PerceptronBP_TopParams *params):BPredUnit(params)
 {
-
+  unsigned globalPredictorSize = params->globalPredictorSize;
+  unsigned globalHistBits = params->globalHistBits;
+  int32_t theta = params->theta;
   DPRINTF(Fetch, "BP_Top Constructor Start %d %d %d\n", globalPredictorSize, globalHistBits, theta);
 	this->globalPredictorSize = floorPow2(globalPredictorSize/(globalHistBits * ceilLog2(theta)));
 	this->globalHistBits = globalHistBits;
