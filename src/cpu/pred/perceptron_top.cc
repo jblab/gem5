@@ -3,7 +3,6 @@
 */
 
 #include "base/intmath.hh"
-#include "base/misc.hh"
 #include "base/trace.hh"
 #include "debug/Perceptron.hh"
 #include "cpu/pred/perceptron.hh"
