@@ -121,3 +121,10 @@ PerceptronBP_Top::changeToPlusMinusOne(int32_t input)
 {
   return (input > 0) ? 1 : -1;
 }
+
+PerceptronBP_Top*
+PerceptronBP_TopParams::create()
+{
+    return new PerceptronBP_Top(this);
+}
+
