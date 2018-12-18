@@ -108,7 +108,7 @@ PerceptronBP_Top::reset()
 }
 
 void 
-PerceptronBP_Top::uncondBranch(void * &bp_history)
+PerceptronBP_Top::uncondBranch(ThreadID tid, Addr pc, void * &bp_history)
 {
     BPHistory *history = new BPHistory;
     history->perceptron_y = 1; //anything greater than 0 is taken
