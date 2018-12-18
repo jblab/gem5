@@ -60,7 +60,7 @@ PerceptronBP_Top::lookup(ThreadID tid, Addr &branch_addr, void * &bp_history)
 void
 PerceptronBP_Top::btbUpdate(ThreadID tid, Addr &branch_addr, void * &bp_history)
 {
-
+DPRINTF(Fetch, "BP_Top lookup y");
 }
 
 void
