@@ -58,7 +58,7 @@ PerceptronBP_Top::lookup(ThreadID tid, Addr &branch_addr, void * &bp_history)
 }
 
 void
-PerceptronBP_Top::BTBUpdate(ThreadID tid, Addr &branch_addr, void * &bp_history)
+PerceptronBP_Top::btbUpdate(ThreadID tid, Addr &branch_addr, void * &bp_history)
 {
 
 }
@@ -108,7 +108,7 @@ PerceptronBP_Top::reset()
 }
 
 void 
-PerceptronBP_Top::uncondBr(void * &bp_history)
+PerceptronBP_Top::uncondBranch(void * &bp_history)
 {
     BPHistory *history = new BPHistory;
     history->perceptron_y = 1; //anything greater than 0 is taken

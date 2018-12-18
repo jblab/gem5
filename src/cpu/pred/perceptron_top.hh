@@ -46,7 +46,7 @@ class PerceptronBP_Top : public BPredUnit
      * @param bp_history Pointer to any bp history state.
      * @return Whether or not the branch is taken.
      */
-    void BTBUpdate(ThreadID tid, Addr &branch_addr, void * &bp_history);
+    void btbUpdate(ThreadID tid, Addr &branch_addr, void * &bp_history);
 
     /**
      * Updates the branch predictor with the actual result of a branch.
@@ -55,7 +55,7 @@ class PerceptronBP_Top : public BPredUnit
      */
     void update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_history);
 
-    void uncondBr(void * &bp_history);
+    void uncondBranch(void * &bp_history);
 
     void squash(ThreadID tid, void *bp_history);
 
