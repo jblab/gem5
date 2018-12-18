@@ -37,7 +37,7 @@ class PerceptronBP_Top : public BPredUnit
      * @param bp_history Pointer to any bp history state.
      * @return Whether or not the branch is taken.
      */                             //NULL
-    bool lookup(ThreadID tid, Addr &branch_addr, void * &bp_history);
+    bool lookup(ThreadID tid, Addr branch_addr, void * &bp_history);
 
     /**
      * Updates the branch predictor to Not Taken if a BTB entry is
@@ -46,14 +46,14 @@ class PerceptronBP_Top : public BPredUnit
      * @param bp_history Pointer to any bp history state.
      * @return Whether or not the branch is taken.
      */
-    void btbUpdate(ThreadID tid, Addr &branch_addr, void * &bp_history);
+    void btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history);
 
     /**
      * Updates the branch predictor with the actual result of a branch.
      * @param branch_addr The address of the branch to update.
      * @param taken Whether or not the branch was taken.
      */
-    void update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_history, bool squashed);
+    void update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history, bool squashed);
 
     void uncondBranch(ThreadID tid, Addr pc, void * &bp_history);
 

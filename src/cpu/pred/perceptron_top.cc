@@ -40,7 +40,7 @@ PerceptronBP_Top::PerceptronBP_Top(const PerceptronBP_TopParams *params):BPredUn
 }
 
 bool
-PerceptronBP_Top::lookup(ThreadID tid, Addr &branch_addr, void * &bp_history)
+PerceptronBP_Top::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
   DPRINTF(Fetch, "BP_Top entered lookup\n");
 	//PerceptronBP* curr_perceptron = this->perceptronTable[ (branch_addr >> 2) & this->globalHistoryMask];
@@ -58,13 +58,13 @@ PerceptronBP_Top::lookup(ThreadID tid, Addr &branch_addr, void * &bp_history)
 }
 
 void
-PerceptronBP_Top::btbUpdate(ThreadID tid, Addr &branch_addr, void * &bp_history)
+PerceptronBP_Top::btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
-DPRINTF(Fetch, "BP_Top lookup y");
+
 }
 
 void
-PerceptronBP_Top::update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_history, bool squashed)
+PerceptronBP_Top::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history, bool squashed)
 {
   BPHistory *history;
   DPRINTF(Fetch, "BP_Top entered update, yhist %d\n",  static_cast<BPHistory *>(bp_history)->perceptron_y);
