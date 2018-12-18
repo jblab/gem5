@@ -11,6 +11,7 @@
 //#include "cpu/o3/sat_counter.hh"
 #include "cpu/pred/perceptron.hh"
 #include "cpu/pred/bpred_unit.hh"
+#include "params/PerceptronBP_Top.hh"
 
 /**
  * Implements a global predictor that uses the PC to index into a table of
