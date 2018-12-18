@@ -64,7 +64,7 @@ PerceptronBP_Top::btbUpdate(ThreadID tid, Addr &branch_addr, void * &bp_history)
 }
 
 void
-PerceptronBP_Top::update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_history)
+PerceptronBP_Top::update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_history, bool squashed)
 {
   BPHistory *history;
   DPRINTF(Fetch, "BP_Top entered update, yhist %d\n",  static_cast<BPHistory *>(bp_history)->perceptron_y);

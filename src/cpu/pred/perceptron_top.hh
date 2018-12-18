@@ -53,7 +53,7 @@ class PerceptronBP_Top : public BPredUnit
      * @param branch_addr The address of the branch to update.
      * @param taken Whether or not the branch was taken.
      */
-    void update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_history);
+    void update(ThreadID tid, Addr &branch_addr, bool taken, void *bp_history, bool squashed);
 
     void uncondBranch(ThreadID tid, Addr pc, void * &bp_history);
 
