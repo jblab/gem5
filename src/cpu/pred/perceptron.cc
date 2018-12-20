@@ -48,14 +48,15 @@ PerceptronBP::reset()
 
 
 void 
-PerceptronBP::train(int8_t branch_outcome, int32_t perceptron_output, int32_t training_threshold, std::vector<int8_t> &X)
+PerceptronBP::train(int8_t branch_outcome, int32_t perceptron_output, int32_t theta, std::vector<int8_t> &X)
 {
     std::string s = "W: ";
     DPRINTF(Fetch, "Perceptron train entered\n");
-    if (this->changeToPlusMinusOne(perceptron_output) != branch_outcome || abs(perceptron_output)<=training_threshold) {//incorrect perceptron prediction. Upgrade the perceptron predictor
+    if (this->changeToPlusMinusOne(perceptron_output) != branch_outcome || abs(perceptron_output)<theta) {//incorrect perceptron prediction. Upgrade the perceptron predictor
         for(int i=0; i< this->W.size(); i++) {
+            // wx+b
             W[i]= W[i]+ branch_outcome * X[i]; //Increase or decrease weight vectors
-            if(abs(W[i]) > this->theta){
+            if(abs(W[i]) > theta){
               if (W[i] < 0){
                 W[i] = theta * -1;
               }

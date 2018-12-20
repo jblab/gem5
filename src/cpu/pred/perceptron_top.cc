@@ -27,9 +27,13 @@ PerceptronBP_Top::PerceptronBP_Top(const PerceptronBP_TopParams *params):BPredUn
 	}
 
 	this->X.push_back(1);
-	for(int i=1;i < globalHistBits; i++) { //
+  // initialize input vector to half 1s and second half -1s. so we start getting taken predictions faster.
+	for(int i=1;i < globalHistBits/2; i++) { //
 		this->X.push_back(-1);
 	}
+  for(int i=globalHistBits/2;i < globalHistBits; i++) { //
+    this->X.push_back(-1);
+  }
 
 	this->globalHistoryMask = (unsigned)(power(2,globalHistBits) - 1);
 
@@ -86,7 +90,7 @@ PerceptronBP_Top::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_hi
       DPRINTF(Fetch, "Miss Count: %d\n", this->missCount);
     }
 
-    delete history;
+    //delete history;
   }
 
 }
