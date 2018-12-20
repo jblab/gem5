@@ -14,8 +14,8 @@ PerceptronBP_Top::PerceptronBP_Top(const PerceptronBP_TopParams *params):BPredUn
   unsigned globalHistBits = params->globalHistBits;
   uint32_t theta = params->theta;
   DPRINTF(Fetch, "BP_Top Constructor Start %d %d %d\n", globalPredictorSize, globalHistBits, theta);
-	//this->globalPredictorSize = floorPow2(globalPredictorSize/(globalHistBits * ceilLog2(theta)));
-  this->globalPredictorSize = globalPredictorSize;
+	this->globalPredictorSize = floorPow2(globalPredictorSize/(globalHistBits * ceilLog2(theta)));
+  //this->globalPredictorSize = globalPredictorSize;
 	this->globalHistBits = globalHistBits;
 
 	if (!isPowerOf2(globalPredictorSize)) {
@@ -30,7 +30,7 @@ PerceptronBP_Top::PerceptronBP_Top(const PerceptronBP_TopParams *params):BPredUn
 	this->X.push_back(1);
   // initialize input vector to half 1s and second half -1s. so we start getting taken predictions faster.
 	for(int i=1;i < globalHistBits/2; i++) { //
-		this->X.push_back(-1);
+		this->X.push_back(1);
 	}
   for(int i=globalHistBits/2;i < globalHistBits; i++) { //
     this->X.push_back(-1);
