@@ -14,7 +14,8 @@ PerceptronBP_Top::PerceptronBP_Top(const PerceptronBP_TopParams *params):BPredUn
   unsigned globalHistBits = params->globalHistBits;
   uint32_t theta = params->theta;
   DPRINTF(Fetch, "BP_Top Constructor Start %d %d %d\n", globalPredictorSize, globalHistBits, theta);
-	this->globalPredictorSize = floorPow2(globalPredictorSize/(globalHistBits * ceilLog2(theta)));
+	//this->globalPredictorSize = floorPow2(globalPredictorSize/(globalHistBits * ceilLog2(theta)));
+  this->globalPredictorSize = globalPredictorSize;
 	this->globalHistBits = globalHistBits;
 
 	if (!isPowerOf2(globalPredictorSize)) {

@@ -99,7 +99,7 @@ class PerceptronBP_Top(BranchPredictor):
 
     globalPredictorSize = Param.Unsigned(8192, "Size of global predictor")
     globalHistBits = Param.Unsigned(13, "Bits per counter")
-    theta = Param.Unsigned(300, "Perceptron's bias")
+    theta = Param.Unsigned(75, "Perceptron's bias")
 
 # TAGE branch predictor as described in https://www.jilp.org/vol8/v8paper1.pdf
 # The default sizes below are for the 8C-TAGE configuration (63.5 Kbits)
