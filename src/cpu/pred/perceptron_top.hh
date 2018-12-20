@@ -83,7 +83,7 @@ class PerceptronBP_Top : public BPredUnit
     std::vector<int8_t> X;
 
     /** Training constraint */
-    int8_t theta;
+    uint32_t theta;
 
     long long int missCount;
 
