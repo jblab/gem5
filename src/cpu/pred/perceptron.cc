@@ -39,23 +39,21 @@ PerceptronBP::getPrediction(std::vector<int8_t>& X)
 int32_t
 PerceptronBP::getPrediction(std::vector<int8_t>& X)
 {
-    uint32_t innerProdManual = 0;
-    std::vector<uint16_t> top_indices;  get_top_2_indices(this.W);
+    std::vector<uint16_t> W_top_indices = top_indices(this->W);
     std::vector<int32_t> new_W;
     std::vector<int8_t> new_X;
-    for(int i=0; i<top_indices.size(); i++){
-        new_W.push_back(W[top_indices[i]]);
-        new_X.push_back(X[top_indices[i]]);
+    for(int i=0; i<W_top_indices.size(); i++){
+        new_W.push_back(W[W_top_indices[i]]);
+        new_X.push_back(X[W_top_indices[i]]);
     }
-    assert(new_X.size() == this->new_W.size());
-    uint32_t innerProdStd =  std::inner_product(new_X.begin(), new_X.end(), this->new_W.begin(), 0);
+    assert(new_X.size() == new_W.size());
+    uint32_t innerProdStd =  std::inner_product(new_X.begin(), new_X.end(), new_W.begin(), 0);
     return innerProdStd;
 }
   
 
 
-std::vector<uint16_t> get_top_2_indices(std::vector<int32_t>& W){
-  //int arr[6] = {4,3,5,1,2,3};
+std::vector<uint16_t> top_indices(std::vector<int32_t>& W){
   int tmp = 0;
   uint16_t highest_inx = 0;
   uint16_t next_highest_inx = 1;
@@ -63,10 +61,10 @@ std::vector<uint16_t> get_top_2_indices(std::vector<int32_t>& W){
   std::vector<uint16_t> output;
   for(int i=0; i<2; ++i){
     for(int j=i+1; j<arr_size; ++j){
-      if(arr[i]<arr[j]){
-        tmp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = tmp;
+      if(W[i]<W[j]){
+        tmp = W[i];
+        W[i] = W[j];
+        W[j] = tmp;
         if(i==0)
             highest_inx = j;
         if(i==1)
