@@ -17,11 +17,11 @@ PerceptronBP::PerceptronBP(uint32_t size, uint32_t theta)
     // fills W with 0's from [begin, end)
     std::fill(this->W.begin(), this->W.end(), 0);
 }
-
+/*
 int32_t
 PerceptronBP::getPrediction(std::vector<int8_t>& X)
 {
-    /* TODO - this function may require X as an input, depending on how the history register is handled*/
+    // TODO - this function may require X as an input, depending on how the history register is handled
     int32_t innerProdManual = 0;
     int32_t innerProdStd =  std::inner_product(X.begin(), X.end(), this->W.begin(), 0);
 
@@ -33,6 +33,52 @@ PerceptronBP::getPrediction(std::vector<int8_t>& X)
     assert(X.size() == this->W.size());
     return innerProdStd;
   
+}
+*/
+
+int32_t
+PerceptronBP::getPrediction(std::vector<int8_t>& X)
+{
+    uint32_t innerProdManual = 0;
+    std::vector<uint16_t> top_indices;  get_top_2_indices(this.W);
+    std::vector<int32_t> new_W;
+    std::vector<int8_t> new_X;
+    for(int i=0; i<top_indices.size(); i++){
+        new_W.push_back(W[top_indices[i]]);
+        new_X.push_back(X[top_indices[i]]);
+    }
+    assert(new_X.size() == this->new_W.size());
+    uint32_t innerProdStd =  std::inner_product(new_X.begin(), new_X.end(), this->new_W.begin(), 0);
+    return innerProdStd;
+}
+  
+
+
+std::vector<uint16_t> get_top_2_indices(std::vector<int32_t>& W){
+  //int arr[6] = {4,3,5,1,2,3};
+  int tmp = 0;
+  uint16_t highest_inx = 0;
+  uint16_t next_highest_inx = 1;
+  uint16_t arr_size = W.size();
+  std::vector<uint16_t> output;
+  for(int i=0; i<2; ++i){
+    for(int j=i+1; j<arr_size; ++j){
+      if(arr[i]<arr[j]){
+        tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+        if(i==0)
+            highest_inx = j;
+        if(i==1)
+            next_highest_inx = j;
+      }
+    }
+  }
+  output.push_back(highest_inx);
+  output.push_back(next_highest_inx);
+  return output;
+  //for(int i=0; i<arr_size; i++)
+  //  cout << arr[i] << endl;
 }
 
 void
