@@ -52,7 +52,7 @@ PerceptronBP::getPrediction(std::vector<int8_t>& X)
 }
 
 std::vector<uint16_t>
-topIndices(std::vector<int32_t>& W){
+PerceptronBP::topIndices(std::vector<int32_t>& W){
   int tmp = 0;
   uint16_t highest_inx = 0;
   uint16_t next_highest_inx = 1;
