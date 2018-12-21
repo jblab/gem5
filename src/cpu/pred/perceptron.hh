@@ -32,8 +32,6 @@ class PerceptronBP
      */
     void reset();
 
-    std::vector<uint16_t> top_indices(std::vector<int32_t>& W);
-
     /**
      * Trains the perceptron branch predictor
      * @param branch_outcome actual result of last branch - Taken = 1, not taken = -1
@@ -43,6 +41,8 @@ class PerceptronBP
      */
     void train(int8_t branch_outcome, int32_t perceptron_output, int32_t training_threshold, std::vector<int8_t>& X);
   private:
+    std::vector<uint16_t> topIndices(std::vector<int32_t>& W);
+
     inline int8_t changeToPlusMinusOne(int32_t input);
 
     /** W array which stores weights for perceptrion branch predictor */

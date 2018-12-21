@@ -39,7 +39,7 @@ PerceptronBP::getPrediction(std::vector<int8_t>& X)
 int32_t
 PerceptronBP::getPrediction(std::vector<int8_t>& X)
 {
-    std::vector<uint16_t> W_top_indices = this->top_indices(this->W);
+    std::vector<uint16_t> W_top_indices = this->topIndices(this->W);
     std::vector<int32_t> new_W;
     std::vector<int8_t> new_X;
     for(int i=0; i<W_top_indices.size(); i++){
@@ -52,7 +52,7 @@ PerceptronBP::getPrediction(std::vector<int8_t>& X)
 }
 
 std::vector<uint16_t>
-top_indices(std::vector<int32_t>& W){
+topIndices(std::vector<int32_t>& W){
   int tmp = 0;
   uint16_t highest_inx = 0;
   uint16_t next_highest_inx = 1;
