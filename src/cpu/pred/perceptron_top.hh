@@ -92,6 +92,8 @@ class PerceptronBP_Top : public BPredUnit
 	std::vector<int8_t>X;
 	};
 
+    std::string takens("");
+
 };
 
 #endif
