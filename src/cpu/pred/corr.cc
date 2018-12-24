@@ -12,13 +12,13 @@ InstShiftAmt(params->instShiftAmt)
 {
 
 // initialise history table and counter table
- for (int i=0; i<16;i++)
+ for (int i=0; i<historyBits;i++)
    {
 
     historytable[i]=0;
   }
 
-   for (int i=0; i<16;i++)
+   for (int i=0; i<historyBits;i++)
    {
 
     countertable[i]=0;
@@ -36,14 +36,14 @@ InstShiftAmt(params->instShiftAmt)
 void CorrBP::reset() {
 
 
-   for (int i=0; i<16;i++)
+   for (int i=0; i<historyBits;i++)
    {
 
     historytable[i]=0;
   }
 
 
-   for (int i=0; i<16;i++)
+   for (int i=0; i<historyBits;i++)
    {
 
     countertable[i]=0;
@@ -59,7 +59,7 @@ unsigned
 CorrBP::calcLocHistIdx(Addr &branch_addr)
 {
     // Get low order bits after removing instruction offset.
-    return (branch_addr >> InstShiftAmt) & (15);
+    return (branch_addr >> InstShiftAmt) & (historyBits-1);
 }
 
 inline
@@ -67,7 +67,7 @@ void
 CorrBP::updateGlobalHistTaken(unsigned branch_lower_order)
 {
    historytable[branch_lower_order]=(historytable[branch_lower_order] <<1) | 1;
-   historytable[branch_lower_order]=(historytable[branch_lower_order] & 15);
+   historytable[branch_lower_order]=(historytable[branch_lower_order] & (historyBits-1));
 
 
     DPRINTF(Fetch, "global branch taken\n");
@@ -81,7 +81,7 @@ void
 CorrBP::updateGlobalHistNotTaken(unsigned branch_lower_order)
 {
    historytable[branch_lower_order]=(historytable[branch_lower_order] <<1) ;
-   historytable[branch_lower_order]=(historytable[branch_lower_order] & 15);
+   historytable[branch_lower_order]=(historytable[branch_lower_order] & (historyBits-1));
 
 
 

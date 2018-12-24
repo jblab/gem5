@@ -77,6 +77,14 @@ void PerceptronBP_Top::log_takens(bool taken){
   DPRINTF(Fetch, "Takens: %s\n", this->takens);
 }
 
+void PerceptronBP_Top::log_takens(bool taken){
+  if(taken)
+    this->takens+="1";
+  else
+    this->takens+="0";
+  DPRINTF(Fetch, "Takens: %s\n", this->takens);
+}
+
 void
 PerceptronBP_Top::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history, bool squashed)
 {

@@ -65,14 +65,16 @@ private:
         unsigned global_pred;
     };
 
-unsigned historytable[16];
-unsigned countertable[16];
+unsigned historytable[historyBits];
+unsigned countertable[historyBits];
 unsigned local_pred;
 unsigned global_pred;
 unsigned InstShiftAmt;
 unsigned index;
 unsigned count;
 unsigned branch_lower_order;
+//unsigned historyBits = 16;
+unsigned historyBits = 65536;
 
 char msg[1000];
 
