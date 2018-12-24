@@ -25,7 +25,7 @@ PerceptronBP::getPrediction(std::vector<int8_t>& X)
     int32_t innerProdManual = 0;
     int32_t innerProdStd =  std::inner_product(X.begin()+1, X.end(), this->W.begin(), 0);
 
-    for(int i=0;i < X.size();i++){
+    for(int i=0;i < W.size();i++){
       innerProdManual += X[i+1] * this->W[i];
     }
 
