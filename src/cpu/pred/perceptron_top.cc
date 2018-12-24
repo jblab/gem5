@@ -69,7 +69,7 @@ PerceptronBP_Top::btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history)
 
 }
 
-void log_takens(bool taken){
+void PerceptronBP_Top::log_takens(bool taken){
   if(taken)
     this->takens+="1";
   else
@@ -80,7 +80,7 @@ void log_takens(bool taken){
 void
 PerceptronBP_Top::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history, bool squashed)
 {
-  log_takens(taken);
+  PerceptronBP_Top::log_takens(taken);
   BPHistory *history;
   DPRINTF(Fetch, "BP_Top entered update, yhist %d\n",  static_cast<BPHistory *>(bp_history)->perceptron_y);
 

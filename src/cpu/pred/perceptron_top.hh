@@ -6,6 +6,7 @@
 #define __CPU_O3_PERCEPTRON_TOP_PRED_HH__
 
 #include <vector>
+#include <string>
 
 #include "base/types.hh"
 //#include "cpu/o3/sat_counter.hh"
