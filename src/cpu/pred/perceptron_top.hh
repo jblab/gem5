@@ -62,6 +62,8 @@ class PerceptronBP_Top : public BPredUnit
 
     void reset();
 
+    void log_takens(bool taken);
+
   private:
     inline int8_t changeToPlusMinusOne(int32_t input);
 
@@ -93,7 +95,7 @@ class PerceptronBP_Top : public BPredUnit
 	std::vector<int8_t>X;
 	};
 
-    std::string takens("");
+    std::string takens;
 
 };
 
