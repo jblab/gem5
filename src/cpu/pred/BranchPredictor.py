@@ -98,7 +98,7 @@ class PerceptronBP_Top(BranchPredictor):
     cxx_header = "cpu/pred/perceptron_top.hh"
 
     globalPredictorSize = Param.Unsigned(8192, "Size of global predictor")
-    globalHistBits = Param.Unsigned(13, "Bits per counter")
+    globalHistBits = Param.Unsigned(3, "Bits per counter")
     theta = Param.Unsigned(75, "Perceptron's bias")
 
 # TAGE branch predictor as described in https://www.jilp.org/vol8/v8paper1.pdf

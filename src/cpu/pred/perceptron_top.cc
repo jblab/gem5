@@ -27,12 +27,13 @@ PerceptronBP_Top::PerceptronBP_Top(const PerceptronBP_TopParams *params):BPredUn
 		this->perceptronTable.push_back(new PerceptronBP(globalHistBits, theta));
 	}
 
-	this->X.push_back(1);
+	this->X.push_back(5);
   // initialize input vector to half 1s and second half -1s. so we start getting taken predictions faster.
-	for(int i=1;i < globalHistBits/2; i++) { //
+  mid = (globalHistBits/2)+1
+	for(int i=0;i < mid; i++) { //
 		this->X.push_back(1);
 	}
-  for(int i=globalHistBits/2;i < globalHistBits; i++) { //
+  for(int mid;i < globalHistBits; i++) { //
     this->X.push_back(-1);
   }
 

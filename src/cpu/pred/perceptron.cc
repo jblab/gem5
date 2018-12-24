@@ -17,25 +17,27 @@ PerceptronBP::PerceptronBP(uint32_t size, uint32_t theta)
     // fills W with 0's from [begin, end)
     std::fill(this->W.begin(), this->W.end(), 0);
 }
-/*
+
 int32_t
 PerceptronBP::getPrediction(std::vector<int8_t>& X)
 {
     // TODO - this function may require X as an input, depending on how the history register is handled
     int32_t innerProdManual = 0;
-    int32_t innerProdStd =  std::inner_product(X.begin(), X.end(), this->W.begin(), 0);
+    int32_t innerProdStd =  std::inner_product(X.begin()+1, X.end(), this->W.begin(), 0);
 
     for(int i=0;i < X.size();i++){
-      innerProdManual += X[i] * this->W[i];
+      innerProdManual += X[i+1] * this->W[i];
     }
 
     assert(innerProdStd == innerProdManual);
-    assert(X.size() == this->W.size());
+    assert(X.size() == this->W.size()+1);
+
+    innerProdStd += X[0];
     return innerProdStd;
   
 }
-*/
 
+/*
 int32_t
 PerceptronBP::getPrediction(std::vector<int8_t>& X)
 {
@@ -50,7 +52,7 @@ PerceptronBP::getPrediction(std::vector<int8_t>& X)
     uint32_t innerProdStd =  std::inner_product(new_X.begin(), new_X.end(), new_W.begin(), 0);
     return innerProdStd;
 }
-
+*/
 std::vector<uint16_t>
 PerceptronBP::topIndices(std::vector<int32_t>& W){
   int tmp = 0;
@@ -98,7 +100,7 @@ PerceptronBP::train(int8_t branch_outcome, int32_t perceptron_output, int32_t th
     if (this->changeToPlusMinusOne(perceptron_output) != branch_outcome || abs(perceptron_output)<theta) {//incorrect perceptron prediction. Upgrade the perceptron predictor
         for(int i=0; i< this->W.size(); i++) {
             // wx+b
-            W[i]= W[i]+ branch_outcome * X[i]; //Increase or decrease weight vectors
+            W[i]= W[i]+ branch_outcome * X[i+1]; //Increase or decrease weight vectors
             if(abs(W[i]) > theta){
               if (W[i] < 0){
                 W[i] = theta * -1;
