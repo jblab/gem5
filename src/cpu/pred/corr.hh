@@ -66,7 +66,7 @@ private:
     };
 
 //unsigned historyBits = 16;
-const static unsigned historyBits = 65536;
+const static unsigned historyBits = 4294967295;
 unsigned historytable[historyBits];
 unsigned countertable[historyBits];
 unsigned local_pred;
