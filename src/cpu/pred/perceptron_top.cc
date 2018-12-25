@@ -79,8 +79,8 @@ void PerceptronBP_Top::log_takens(bool taken){
 
 void PerceptronBP_Top::log_addresses(Addr addr){
   this->addrs+=(","+std::to_string(addr));
-  if(sizeof(this->addrs)>1000)
-    DPRINTF(Fetch, "Takens: %s\n", this->takens);
+  //if(sizeof(this->addrs)>1000)
+  DPRINTF(Fetch, "Takens: %s\n", this->addrs);
 }
 
 void
