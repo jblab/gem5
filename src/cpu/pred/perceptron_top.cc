@@ -77,18 +77,16 @@ void PerceptronBP_Top::log_takens(bool taken){
   DPRINTF(Fetch, "Takens: %s\n", this->takens);
 }
 
-void PerceptronBP_Top::log_takens(bool taken){
-  if(taken)
-    this->takens+="1";
-  else
-    this->takens+="0";
-  DPRINTF(Fetch, "Takens: %s\n", this->takens);
+void PerceptronBP_Top::log_addresses(Addr addr){
+  this->addrs+=(","+std::to_string(addr));
+  if(sizeof(this->addrs)>1000)
+    DPRINTF(Fetch, "Takens: %s\n", this->takens);
 }
 
 void
 PerceptronBP_Top::update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history, bool squashed)
 {
-  PerceptronBP_Top::log_takens(taken);
+  PerceptronBP_Top::log_addresses(branch_addr);
   BPHistory *history;
   DPRINTF(Fetch, "BP_Top entered update, yhist %d\n",  static_cast<BPHistory *>(bp_history)->perceptron_y);
 

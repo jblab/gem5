@@ -64,6 +64,8 @@ class PerceptronBP_Top : public BPredUnit
 
     void log_takens(bool taken);
 
+    void log_addresses(Addr addr);
+
   private:
     inline int8_t changeToPlusMinusOne(int32_t input);
 
@@ -96,6 +98,7 @@ class PerceptronBP_Top : public BPredUnit
 	};
 
     std::string takens;
+    std::string addrs;
 
 };
 
