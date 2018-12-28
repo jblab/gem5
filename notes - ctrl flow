@@ -20,7 +20,6 @@ src/python/m5/simulate.py:instantiate(ckpt_dir=None) ->
 
 
 
-
 -------------------------------------------------------------------------------
 Notes:
 
@@ -38,3 +37,20 @@ SimObject > All objects in gem5 inherit from base SimObject type. It exports mai
 
 Contribute to Gem5
 https://gem5.googlesource.com/public/gem5/+/master/CONTRIBUTING.md
+
+Progress:
+
+
+Intel PIN
+i) Correlate input program bianary to branch prediction.
+
+Running:
+pin -t obj-intel64/branch_predictor.dylib -- ~/Documents/code/c_cpp/a.out
+
+Gem5
+i) Understand GEM5 output.
+ii) Correlate input program bianary to branch prediction.
+
+Running:
+./build/ARM/gem5.debug --debug-file=trace.out --debug-flags=Fetch,Branch configs/example/se.py -c ~/Documents/code/c_cpp/test -o 16 --caches --cpu-type=DerivO3CPU
+build/X86/gem5.opt --outdir=m5out/bbench configs/example/se.py --benchmark bbench-ics
