@@ -1,0 +1,13 @@
+
+Q/A:
+Q: Why do we need to store globalHistory/gHist. Where is it used?
+A: gHist is window of last 130 branch prediction that points to globalHistory of length 2097152. 
+Author's explaination for a large global history: we manage the history in a big table in order to reduce the simulation time.
+gHist of size 130 is used in calculating comp value of FoldedHistory.
+
+Q: What's the difference between path history and global history?
+A: Path History is lsb of last 16 branch addresses.
+Global history keeps last 130 branch predictions.
+
+Q: What's the logic behind calculating index and tag?
+A: 

@@ -1,0 +1,45 @@
+Wormhole: Multidimensional Predictor
+
+What are other dimensions of branch history?
+i) Outer and inner loop iterations with their branch outcomes represented in a 2d matrix. So, instead of
+10010 10010, as 1d history, they have:
+10010
+10010
+
+How to represent multidimensional branch history as a matrix?
+same as above.
+
+TAGE Predictor[1]
+
+Basic Design Analysis:
+Directly derived from Michaud's PPM like tag-based BP.
+Stands for Tagged Geometric History Length BP
+Obtaining Prediction:
+i) Base predictor provides default prediction. Tagged components provide a prediction only on a tag match.
+ii) Prediction is provides by hitting tagged predictor component that uses the longest history.
+iii) In case of no matching tagged predictor component, default prediction is used. 
+
+Updating useful counter u of the
+
+
+[1]: Michaud's PPM like tag-based BP:
+Design:
+ii) GPPM features 2 tables - A bimodal table and a global table.
+iii) Bimodal table is indexed with branch PC. 
+iv) Global table consists of several banks. Each bank is indexed with different global history length.
+v) Each global entry contains a tag for identifying the global-history value owning the entry, and a prediction associated with this global history value.
+vi) Prediction is given by the longest matching global-history value, or by the bimodal table if there is a tag miss in all the global banks.
+vii) It features 5 banks. Leftmost bank is a bimodal predictor. It is referred to as bank 0. It has 4k entries, and is indexed with the 12 least significant bits of the branch PC. Each entry of bank 0 contains a 3-bit up-down saturating counter. Bank 0 uses a total of 4k*(3+1) = 16kbits of storage.
+viii) 4 other banks are indexed both with the branch PC and some global history bits. The global history bits are 10,20,40,80 most recent bits in the 80-bit global history. 
+ix) When the number of global history bits exceeds the number of index bits, the global history is "folded" by a bit-wise XOR of groups of consecutive history bits, then it is XORed with the branch PC as in a gshare predictor. 
+x) Ex- bank 3 is indexed with 40 history bits, and the index may be implemented as pc[0:9] XOR h[0:9] XOR h[10:19] XOR h[20:29] XOR h[30:39]
+xi) Each of the banks has 1k entries. Each entry contains an 8-bit tag, a 3-bit up-down saturating counter, and a u bit (u stands for useful entry), for a total of 12 bits per entry. So each of the banks 1 to 4 uses a total of 1k*(3+8+1)=12kbits. So, total storage used by predictor is 16k+4*12k=64kbits.
+Obtaining Prediction:
+i) 5 banks are accessed simultaneously.
+ii) While accessing, 8-bit tag is computed for each bank 1 to 4. 
+iii) Hash function used to compute the 8-bit tag is different from the one used to index the bank, but it takes as input the same PC and global history bits.
+iv) Once the access is done, we obtain four 8-bit tags from banks 1 to 4, and 5 prediction bits from banks 0 to 4 (the prediction bit is the most significant bit of the 3-bit counter). We obtain a total of 4*8+5=37 bits. These 37 bits are then reduced to a 0/1 final prediction. The final prediction is the MSB of the 3-bit counter associated with the longest matching history. That is, if the computed tag on bank 4 matches the stored tag, we take the prediction from bank 4 as the final prediction. If there is a tag mismatch on each bank 4 to 1, the final prediction is given by bank 0.
+Predictor Update:
+i) We know the prediction, from which bank was obtained, and whether the prediciton was correct or not. 
+ii) Update 3-bit counter. TBC.
+iii) If X<=3, and if the prediction was wrong, we allocate TBC

@@ -1,0 +1,112 @@
+Neural BPs Review
+Review Paper Neural BP Approaches:
+
+1) Perceptron:
+Idea:
+Adv: 
+i) Can keep long history -  size of 2-level BPs grows exponentially with history length, size of Perceptron BP increases only linearly.
+ii) Output shows confidence level of predictions since diff between output and 0 shows certainty of taking a branch.
+iii) Works well for linearly separable branches.
+Disadv: 
+i) High latency.
+ii) Does not work on linearly inseparable branches (can be used in with a hybrid predictor).
+
+2) Path based Neural BP [48][49][23]:
+Idea: 
+i) ahead-pipelining - chooses weight vector depending upon the path that leads to a branch, instead of only branch address.
+ii) staggers computation over time.
+Adv:
+i) Higher accuracy. 
+ii) Computation can start before a prediction is made.
+iii) ahead-pipelining reduces latency.
+Disadv:
+i) Mixes stale/partial information for making prediction.
+ii) Misprediction requires rolling back large amount of processsor state to a checkpoint.
+iii) Replaces more power/area efficient carry-save adders of original perceptron BP with several carry-completing adders, leading to higher complexity.
+
+3) Piecewise-linear BP [51]:
+Idea: 
+i) Generalization of path-based BPs.
+ii) Correlates each element of each path leading to B.
+iii) Tracks likelihood of a branch at a certain position in the history to agree with result of B.
+iv) Generates multiple linear functions, 1 for each path to the current branch.
+v) Also uses ahead-pipelining and small values for history length.
+Adv:
+i) Works on linearly inseparable branches.
+ii) Achieves lower misprediction rate.
+iii) They show practical version of their BP outperforms other predictors.
+Disadv:
+i) No accouting for storage budget or latency.
+
+4) Multi-layer Perceptron with Backpropogation [28][53]:
+i) Works on linearly inseparable branches.
+Adv:
+i) Provides higher 'asymtotic' accuracy than Perceptron BP.
+Disadv:
+i) Longer time for training and prediction, which makes it infeasible and ineffective.[53]
+
+5) Hashed Perceptron BP [23]:
+Idea:
+i) Uses ideas from gshare, path-based and perceptron BPs.
+ii) Assigns multiple branches to the same weight by XORing a segment of the global branch history with the PC.
+iii) With hashed indexing, every table works as a small gshare BP. 
+Adv:
+i) Works on linearly inseparable branches.
+ii) Uses small no. of weights for the same history length compared to path-based BP - reduces the chances that multiple weights with no correlation overturn a single weight with strong correlation. 
+iii) Shorter pipeline compared to global or path-based BP; reduces amount of state to be checkpointed.
+iv) Uses ahead-pipelining to reduce latency.
+v) Low latency compared to path based and global neural BP.
+
+6) Math based Technique which shows that in Perceptron based BPs, value of perceptron weights shows correlation strength between branches.[22]:
+Idea:
+i) Reassemble input to BP by only using branches that show most correlation.
+ii) Use static profiling for finding a suitable input vector for each workload type and this is selected at runtime based on application type.
+iii) Weakly correlated inputs are substituted by strongly-correlated inputs.
+iv) Periodically tested during runtime to account for change in input and phase behavior.
+Adv:
+i) Improves accuracy significantly by avoiding noise.
+Disadv:
+?
+
+7) Perceptron based Confidence Estimator (CE) [24]:
+Idea:
+1) Training of CE happens non speculatively at retirement.
+not clear
+Adv:
+not clear
+Disadv:
+not clear
+
+8) Modulo Path History based BP [18][98]:
+Idea:
+i) Decouplle path and branch history lengths by using modulo path-history. 
+ii) Only use most recent P(< h) branch addresses in path history.
+Adv:
+i) Reduces the no. of pipeline stages and tables.
+ii) Reduces the amount of state to be checkpointed.
+iii) Reduces energy consumption with negligible reduction in accuracy.
+
+-----------------------------------------
+Problems:
+To predict each branch, Perceptron BP may require computing a dot product with tens or hundreds of values, which increases its latency/energy/area and renders it infeasible for implementation in real processors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

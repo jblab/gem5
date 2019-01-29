@@ -1,0 +1,23 @@
+Design
+
+Constraints/Degrees of Freedom:
+Storage Budget?
+32kbits to 1MBits?
+
+Theoretical Analysis:
+
+How is geometric series history lengths better than having single history? 
+Accomodates variable history lengths. But is there a better distribution that geometric?
+
+Comparison of hash_fn/mod/bitXOR/bitAND indices?
+
+
+Theoretical Improvement:
+
+
+Lookup?
+Saturated Arithmetric
+XOR Tree 
+
+Acronyms:
+soa: state-of-art

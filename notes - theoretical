@@ -1,0 +1,36 @@
+
+globalPredictorSize
+globalHistBits
+perceptronTable
+X
+globalHistoryMask
+theta
+missCount
+
+-----------------
+1=taken
+-1-not taken
+branch_history_arr = [-1,1,-1...]
+branch_outcome = -1|1
+perceptron_output = -1|1
+theta = 10
+
+update > 
+PerceptronBP::train(branch_outcome, perceptron_output, theta, branch_history_arr) >
+if ( (branch_outcome!=perceptron_output) || (perceptron_output<theta) ):
+update each weight in this->W with: W[i]= W[i]+ branch_outcome * branch_history_arr[i];
+reset W[i] to theta if its value goes over theta.
+
+lookup > 
+pred=W.branch_history_arr // dot product
+pred>=0 is taken. -ve is not taken
+
+
+Story:
+We make branch prediction using a perceptron, which is dot product of 13 inputs and 13 weights. We have 64 perceptrons. It acts as a hash table, multiple branches are associated to 1 perceptron using 'and' of branch address and the no. of perceptrons which is 64 (can do the same with a mod operator).
+Perceptron output is last 13 inputs correlated with last branch outcome.
+
+
+Given current branch outcome (c), 13 last branch outcomes (l), 13 weights (w), theta=75 (t), we get an accuracy=0.816
+w = t + w + c*l
+

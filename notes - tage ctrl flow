@@ -1,0 +1,400 @@
+
+------------scratch space------------
+1111
+0011
+0011
+
+
+------------------------------------------------
+Branch Prediction Ctrl Flow ->
+
+src/cpu/o3/fetch_impl.hh
+DefaultFetch<Impl>::fetch(bool &status_change) -> DefaultFetch.lookupAndUpdateNextPC 
+DefaultFetch.lookupAndUpdateNextPC ->  BPredUnit::predict(const StaticInstPtr &inst, const InstSeqNum &seqNum, TheISA::PCState &pc, ThreadID tid)
+BPredUnit::predict -> 
+
+
+Important Classes/Methods:
+
+StaticInst > Base, ISA-independent static instruction class. Main component of this class is the vector of flags and the associated methods for reading them. Any object that can solely rely on these flags can process instructions without being recompiled for multiple ISAs.
+
+configs/common/cores/arm
+O3_ARM_v7a.py > stores all configuration related to ARM V7a architecture. 
+
+Python:
+src/python/m5
+params.py > The _params dictionary in each class maps parameter names to either a Param or a VectorParam object. These objects contain the parameter description string, the parameter type, and the default value (if any). The convert() method on these objects is used to force whatever value is assigned to the parameter to the appropriate type.
+
+
+Variables:
+src/cpu/pred/BranchPredictor.py
+instShiftAmt >  = Param.Unsigned(2, "Number of bits to shift instructions by")
+
+
+Concepts:
+Program Counter (PC): is a processor register that indicates where a computer is in its program sequence. In most processors, PC is incremented after fetching an instruction, and holds the memory address (points to) of the next instruction that would be executed. In a processor where the incrementation precedes the fetch, the PC points to the current instruction being executed. 
+
+TAGE Concepts:
+Global History Folding: Each bank is indexed by x most recent history bits. When the number of global history bits exceeds the number of index bits, the global history is 'folded' by a bitwise XOR of groups of consecutive history bits, then XORed with branch PC.
+
+Prediction: At prediction time, banks are accessed from highest to lowest history banks lengths. While accessing the banks, an 8-bit tag is computed for each bank 1 to 7. The hash function used to compute the 8-bit tag is different from the one used to index the bank, but it takes as input the same PC and global history bits. The final prediction is the MSB of the 3 bit counter associated with the longest matching history.
+
+
+TAGE Contact: seznec@irisa.fr
+------------------------------------------------
+
+Tage Ctrl Flow ->
+
+
+computeIndices = FoldedHistory[8]
+instShiftAmt=2
+threadHistory // vector of stuct ThreadHistory
+FoldedHistory //compressed history to mix with instruction PC to index partially tagged tables.
+//index = shiftedPc XOR (right_shifted_shiftedPc) XOR ()
+
+TAGE <constructor>:
+logRatioBiModalHystEntries = 2
+nHistoryTables = 7
+tagTableCounterBits = 3
+tagTableUBits = 2
+histBufferSize = 2097152
+minHist = 5
+maxHist = 130
+pathHistBits = 16
+tagTableTagWidths = [0, 9, 9, 10, 10, 11, 11, 12]
+logTagTableSizes = [13, 9, 9, 9, 9, 9, 9, 9] //compressed_length of FoldedHistory
+threadHistory = numThreads
+logUResetPeriod = 18
+useAltOnNaBits = 4
+tCounter = ULL(1) << (logUResetPeriod - 1); //initialize the counter to half of the period= 131,072
+useAltPredForNewlyAllocated = 0
+TageEntry **gtable;
+BIMODAL_ONLY = 0
+
+structs (tage.hh)
+TageEntry{ int8_t ctr; uint16_t tag; uint8_t u; TageEntry() : ctr(0), tag(0), u(0) {} };
+TageBranchInfo {} // captures pred, addr etc about branch
+ThreadHistory {} //per thread history to support fetching instructions from multiple threads in a cycle
+
+for history in threadHistory:
+ history.pathHist = 0;
+ history.globalHistory = new uint8_t[histBufferSize]; //int[2097152]
+ history.gHist = history.globalHistory; // gHist is an int array of size 2097152.
+ memset(history.gHist, 0, histBufferSize); // initialize each thread history (gHist) to 0.
+ history.ptGhist = 0; // initialize index of history table (ptGhist) to 0.
+
+histLengths = int[8]
+histLengths[1] = minHist //5
+histLengths[7] = maxHist //130
+histLengths = [0,5,9,15,26,44,76,131] //original_length of FoldedHistory
+
+for history in threadHistory:
+ history.computeIndices = new FoldedHistory[8]
+ history.computeTags[0] = new FoldedHistory[8]
+ history.computeTags[1] = new FoldedHistory[8]
+  for i=1 to 7:
+   history.computeIndices[i].init(histLengths[i], logTagTableSizes[i]) //initialized 7 FoldedHistory structs
+   history.computeTags[0][i].init(history.computeIndices[i].origLength, tagTableTagWidths[i]) 
+   history.computeTags[1][i].init(history.computeIndices[i].origLength, tagTableTagWidths[i]-1);
+  //result:
+  history.computeIndices[1].init(5,9)
+  history.computeIndices[2].init(9,9)
+  history.computeIndices[3].init(15,9)
+  history.computeIndices[4].init(26,9)
+  history.computeIndices[5].init(44,9)
+  history.computeIndices[6].init(76,9)
+  history.computeIndices[7].init(131,9)
+
+  history.computeTags[0][1].init(5,9)
+  history.computeTags[0][2].init(9,9)
+  history.computeTags[0][3].init(15,10)
+  history.computeTags[0][4].init(26,10)
+  history.computeTags[0][5].init(44,11)
+  history.computeTags[0][6].init(76,11)
+  history.computeTags[0][7].init(131,12)
+
+  history.computeTags[1][1].init(5,8)
+  history.computeTags[1][2].init(9,8)
+  history.computeTags[1][3].init(15,9)
+  history.computeTags[1][4].init(26,9)
+  history.computeTags[1][5].init(44,10)
+  history.computeTags[1][6].init(76,10)
+  history.computeTags[1][7].init(131,11)
+
+bimodalTableSize = ULL(1) << logTagTableSizes[0]; // 1<<13=8192
+btablePrediction.resize(bimodalTableSize, false); // make vector btablePrediction size 8192, initialize values to false.
+btableHysteresis.resize(bimodalTableSize >> logRatioBiModalHystEntries, true); // make vector btableHysteresis size 2048, initialize values to true.
+TageEntry **gtable = new TageEntry*[8]; //gtable is array of 8 TageEntry* pointers.
+for i=1 to 7:
+ gtable[i] = new TageEntry[1<<(logTagTableSizes[i])];
+ //result:
+ gtable[1] = new TageEntry[512]
+ gtable[2] = new TageEntry[512]
+ gtable[3] = new TageEntry[512]
+ gtable[4] = new TageEntry[512]
+ gtable[5] = new TageEntry[512]
+ gtable[6] = new TageEntry[512]
+ gtable[7] = new TageEntry[512]
+ //so gtable=8 X 512 matrix of TageEntry
+
+tableIndices = new int[8]
+tableTags = new int[8]
+</constructor>
+
+#lookup(ThreadID tid, Addr branch_pc, void* &bp_history)
+bool retval = predict(tid, branch_pc, true, bp_history)
+updateHistories(tid, branch_pc, retval, bp_history)
+#/lookup()
+
+#predict(ThreadID tid, Addr branch_pc, bool cond_branch, void* &b)
+TageBranchInfo *bi = new TageBranchInfo(8)
+b = (void*)(bi)
+return tagePredict(tid, branch_pc, cond_branch, bi)
+#/predict()
+
+#tagePredict(ThreadID tid, Addr branch_pc, bool cond_branch, TageBranchInfo* bi)
+Addr pc = branch_pc; //branch program counter
+bool pred_taken = true;
+if (cond_branch):
+ for i=1 to 7: //starts from 1, because 0 is bimodal bank
+  bi->tableIndices[i] = gindex(tid, pc, i);
+  bi->tableTags[i] = gtag(tid, pc, i);
+ bi->bimodalIndex = bindex(pc);
+ bi->hitBank = 0;
+ bi->altBank = 0;
+ // going high to low because we need pred with longest match. 
+ // longest history stored in bank 7. shortest in bank 1.
+ for i=7 to 1: 
+  // get index in bank if branch entry is found in the bank
+  if (gtable[i][tableIndices[i]].tag == tableTags[i]):
+   bi->hitBank = i //note which bank (out of 7) if tag matches
+   bi->hitBankIndex = tableIndices[bi->hitBank] // note which index in bank
+   break //because we have our tag which we use to make prediction
+ for i=bi->hitBank to 1: //same as above, but find alternate bank
+  if (gtable[i][tableIndices[i]].tag == tableTags[i]):
+  	bi->altBank = i
+    bi->altBankIndex = tableIndices[bi->altBank]
+    break
+ // compute prediction and alternate prediction   
+ if (bi->hitBank > 0):
+  if (bi->altBank > 0):
+   //altTaken is true if counter associated with entry (we got this entry using tag) > 0. 
+   bi->altTaken = gtable[bi->altBank][tableIndices[bi->altBank]].ctr >= 0
+  else:
+   bi->altTaken = getBimodePred(pc, bi)
+  bi->longestMatchPred = gtable[bi->hitBank][tableIndices[bi->hitBank]].ctr >= 0
+  // bi->pseudoNewAlloc is true if absolute value of ctr <= 1, means prediction is weak.
+  bi->pseudoNewAlloc = abs(2 * gtable[bi->hitBank][bi->hitBankIndex].ctr + 1) <= 1
+  // Capture prediction in BranchInfo.
+  if ((useAltPredForNewlyAllocated < 0) || ! bi->pseudoNewAlloc):
+   bi->tagePred = bi->longestMatchPred
+   bi->provider = TAGE_LONGEST_MATCH
+  else
+   bi->tagePred = bi->altTaken
+   bi->provider = bi->altBank ? TAGE_ALT_MATCH : BIMODAL_ALT_MATCH
+ else:
+  bi->altTaken = getBimodePred(pc, bi)
+  bi->tagePred = bi->altTaken
+  bi->longestMatchPred = bi->altTaken
+  bi->provider = BIMODAL_ONLY //0
+ pred_taken = (bi->tagePred);
+bi->branchPC = branch_pc
+bi->condBranch = cond_branch
+return pred_taken
+#/tagePredict()
+
+//gindex computes a full hash of pc, ghist and pathHist
+#gindex(ThreadID tid, Addr pc, int bank)
+int index;
+int hlen=(histLengths[bank]>pathHistBits) ? pathHistBits :histLengths[bank]; //hlen should not exceed 16
+const Addr shiftedPc = pc >> instShiftAmt; //shifted pc. right shift by 2.
+index = shiftedPc ^ (shiftedPc >> ((int) abs(logTagTableSizes[bank] - bank) + 1)) ^
+threadHistory[tid].computeIndices[bank].comp ^ F(threadHistory[tid].pathHist, hlen, bank);
+// index = (shiftedPC) XOR (shiftedPC_MSBbyBank) XOR (FoldedHistory comp value) XOR (XORed FoldedPath)
+//i = 1 | index=shiftedPC ^ 9 ^ 0 ^ 0
+//i = 2 | index=shiftedPC ^ 8 ^ 0 ^ 0
+//i = 3 | index=shiftedPC ^ 7 ^ 0 ^ 0
+//i = 4 | index=shiftedPC ^ 6 ^ 0 ^ 0
+//i = 5 | index=shiftedPC ^ 5 ^ 0 ^ 0
+//i = 6 | index=shiftedPC ^ 4 ^ 0 ^ 0
+//i = 7 | index=shiftedPC ^ 3 ^ 0 ^ 0
+return (index & 511)
+#/gindex()
+
+#F(int A, int size, int bank) //F means fold path history by XORing
+int A1, A2;
+A = A & ((ULL(1) << size) - 1); // A & 65,535 : make sure history size is below 65,535
+A1 = (A & ((ULL(1) << logTagTableSizes[bank]) - 1)); // A & 511. A1 is lsbits of A/history, max size 511, so 9 lsbits.
+A2 = (A >> logTagTableSizes[bank]); // A >> 9 : A2  is msbits of A/history, max size 65535>>9=127, so 7 msbits.
+A2 = ((A2 << bank) & ((ULL(1) << logTagTableSizes[bank]) - 1))
++ (A2 >> (logTagTableSizes[bank] - bank)); // 0 in 1st iter
+A = A1 ^ A2;//0
+#/F()
+
+#gtag(ThreadID tid, Addr pc, int bank)
+int tag = shiftedPc ^ threadHistory[tid].computeTags[0][bank].comp  ^
+(threadHistory[tid].computeTags[1][bank].comp << 1)
+//shiftedPC ^ 0 ^ 0
+return (tag & ((ULL(1) << tagTableTagWidths[bank]) - 1));
+// return(shiftedPC & 511) max value: 511 for bank 1
+#/gtag()
+
+#bindex(Addr pc_in)
+return ((pc_in >> instShiftAmt) & ((ULL(1) << (logTagTableSizes[0])) - 1));
+//return(shiftedPc & 8191) : means index value cannot go over 8191
+#/bindex()
+
+#getBimodePred(Addr pc, TageBranchInfo* bi)
+return btablePrediction[bi->bimodalIndex]
+#/getBimodePred()
+
+#uncondBranch(ThreadID tid, Addr br_pc, void* &bp_history)
+predict(tid, br_pc, false, bp_history); // returns true (means always taken)
+updateHistories(tid, br_pc, true, bp_history)
+#/uncondBranch()
+
+#updateHistories(ThreadID tid, Addr branch_pc, bool taken, void* b)
+TageBranchInfo* bi = (TageBranchInfo*)(b); //initialize branch info object
+ThreadHistory& tHist = threadHistory[tid]; //get ThreadHistory associated to current thread
+bool pathbit = ((branch_pc >> instShiftAmt) & 1) //lsb(shiftedPc)
+updateGHist(tHist.gHist, taken, tHist.globalHistory, tHist.ptGhist);
+tHist.pathHist = (tHist.pathHist << 1) + pathbit // captures recent branch prediction (in lsb)
+tHist.pathHist = (tHist.pathHist & ((ULL(1) << pathHistBits) - 1)) // truncate pathHist to 65535 (or 16 bits)
+bi->ptGhist = tHist.ptGhist // record ptGhist in BranchInfo
+bi->pathHist = tHist.pathHist // record pathHist in BranchInfo
+for i=1 to 7:
+ bi->ci[i]  = tHist.computeIndices[i].comp // backup computeIndices of all 7 banks of this thread
+ bi->ct0[i] = tHist.computeTags[0][i].comp
+ bi->ct1[i] = tHist.computeTags[1][i].comp
+ tHist.computeIndices[i].update(tHist.gHist) // update prediction index in FoldedHistory
+ tHist.computeTags[0][i].update(tHist.gHist) // update prediction tag in FoldedHistory
+ tHist.computeTags[1][i].update(tHist.gHist) // update prediction tag in FoldedHistory
+#/updateHistories()
+
+// fromCode: shifting global history: we manage the history in a big table in order to reduce the simulation time.
+// (* &h=ghist, dir=pred_taken, tab=globalHistory/int[2097152], &pt=index_to_most_recent_branch_outcome)
+#updateGHist(uint8_t * &h, bool dir, uint8_t * tab, int &pt)
+if (pt == 0): //roll over history if true
+ for i=0 to 130:
+  tab[histBufferSize - maxHist + i] = tab[i] // move first 130 values to the end of globalHistory
+ pt =  histBufferSize - maxHist //2097152-130 => set pt to 2097022
+ h = &tab[pt]; // set gHist to last 130 values of globalHistory
+pt-- // decrement pt by 1
+h-- // gHist-- will push the last element out and set first value of gHist to 0. It's a queue, FIFO.
+h[0] = (dir) ? 1 : 0 // record branch prediction in first value of gHist.
+#/updateGHist()
+
+//condBranchUpdate(PC, taken, BranchInfo, RandNoBetween_0_3)
+#condBranchUpdate(Addr branch_pc, bool taken, TageBranchInfo* bi, int nrand)
+bool longest_match_pred = false
+bool alloc = (bi->tagePred != taken) && (bi->hitBank < nHistoryTables)
+if (bi->hitBank > 0): // means if prediction was made from one of the global banks:
+ longest_match_pred = bi->longestMatchPred
+ bool PseudoNewAlloc = bi->pseudoNewAlloc
+ // an entry is considered newly allocated if its prediction counter is weak
+ if (PseudoNewAlloc): 
+  // should not be newly allocated if prediction was correct (even though it is weak)
+  if (longest_match_pred == taken):
+   alloc = false
+  
+  // doing this to make sure pred is not from bimode bank. but WHY? we already made that check in if (bi->hitBank > 0)
+  if (longest_match_pred != bi->altTaken):
+   ctrUpdate(useAltPredForNewlyAllocated, bi->altTaken == taken, useAltOnNaBits)
+
+if(alloc): // if branch entry needs to be newly allocated (because counter prediciton is weak):
+ int min = 1 // min is used to capture if useful flag is set or reset (1 or 0)
+ for (int i = nHistoryTables; i > bi->hitBank; i--): // for banks where no tag match was found:
+  if (gtable[i][bi->tableIndices[i]].u < min): // if useful entry is 0/reset:
+   min = gtable[i][bi->tableIndices[i]].u  // update min to useful entry value (which is 0)
+ 
+ // fromCode: we allocate an entry with a longer history to avoid ping-pong \
+     we do not choose systematically the next entry, but among the next 3 entries.
+ int Y = nrand & ((ULL(1) << (nHistoryTables - bi->hitBank - 1)) - 1) // nrand is rand no b/w 0 and 3. ex- 11 & ((1<<7-4)-1) => 11&111 => 11/3
+ int X = bi->hitBank + 1
+ if (Y & 1): // move to next bank.
+  X++
+  if (Y & 2): // move to next bank.
+   X++
+ if (min > 0): // reset TageEntry u of a random bank X with the same index as matched TageEntry
+  gtable[X][bi->tableIndices[X]].u = 0
+ // fromCode: Allocate only  one entry
+ for (int i = X; i <= nHistoryTables; i++): // update TageEntry of 1 of the remaining banks where u is 0/reset.
+  if ((gtable[i][bi->tableIndices[i]].u == 0)): // if u is reset
+   gtable[i][bi->tableIndices[i]].tag = bi->tableTags[i] // update that entry's tag and counter
+   gtable[i][bi->tableIndices[i]].ctr = (taken) ? 0 : -1
+   break
+
+// fromCode: periodic reset of u: reset is not complete but bit by bit   
+tCounter++
+if ((tCounter & ((ULL(1) << logUResetPeriod) - 1)) == 0): // reset useful flag at half the history size ~135k branches.
+ // fromCode: reset lsb. msb becomes lsb 
+ for (int i = 1; i <= nHistoryTables; i++):
+  for (int j = 0; j < (ULL(1) << logTagTableSizes[i]); j++):
+   gtable[i][j].u = gtable[i][j].u >> 1 // resetting msb to lsb
+ 
+// update counters.
+if (bi->hitBank > 0): // if branch entry was found in banks 1 to 7
+ ctrUpdate(gtable[bi->hitBank][bi->hitBankIndex].ctr, taken, tagTableCounterBits) // update hitBank entry counter: ctrUpdate(hit_ctr, taken, 3)
+ if (gtable[bi->hitBank][bi->hitBankIndex].u == 0):
+  if (bi->altBank > 0):
+   ctrUpdate(gtable[bi->altBank][bi->altBankIndex].ctr, taken,tagTableCounterBits) //  update altBank entry counter.
+  if (bi->altBank == 0): // update bimode bank counter.
+   baseUpdate(branch_pc, taken, bi)
+ if (bi->tagePred != bi->altTaken):
+  unsignedCtrUpdate(gtable[bi->hitBank][bi->hitBankIndex].u, bi->tagePred == taken, tagTableUBits)
+else:
+ baseUpdate(branch_pc, taken, bi)
+#/condBranchUpdate()
+
+// increment counter if taken, decrement if not taken.
+#ctrUpdate(int8_t & ctr, bool taken, int nbits)
+if(taken):
+ if(ctr < ((1 << (nbits - 1)) - 1)): // if ctr < 7.
+  ctr++
+else:
+ if (ctr > -(1 << (nbits - 1))): // if ctr > -8
+  ctr--
+#/ctrUpdate()
+
+// fromCode: update the bimodal predictor.
+// fromCode: a hysterisis bit is shared among N prediction bits (N = 2 ^ logRatioBiModalHystEntries)
+// logRatioBiModalHystEntries = 2
+// bi->bimodalIndex is lsb of shiftedPC max value 8191
+#baseUpdate(Addr pc, bool taken, TageBranchInfo* bi)
+ int inter = (btablePrediction[bi->bimodalIndex] << 1) + btableHysteresis[bi->bimodalIndex >> logRatioBiModalHystEntries]
+ if(taken):
+  if(inter < 3):
+   inter++
+  else if(inter > 0):
+   inter--
+ const bool pred = inter >> 1
+ const bool hyst = inter & 1
+ btablePrediction[bi->bimodalIndex] = pred
+ btableHysteresis[bi->bimodalIndex >> logRatioBiModalHystEntries] = hyst
+#/baseUpdate()
+
+// if branch pred matches then up, else down
+// fromCode: up/down unsigned saturating counter.
+#unsignedCtrUpdate(uint8_t & ctr, bool up, unsigned nbits)
+if(up):
+ if(ctr < ((1 << nbits) - 1)):
+  ctr++
+ else:
+  if(ctr):
+   ctr--
+#/unsignedCtrUpdate()
+
+FoldedHistory:
+origLength = // initialized to [5,9,15,26,44,76,131],one for each of 7 banks.
+compLength = // initialized to [13, 9, 9, 9, 9, 9, 9, 9], one for each of 7 banks.
+outpoint = // initialized to [5,0,6,8,8,4,5], origLength mod compLength, one for each of banks.
+#update(uint8_t * h) // h/gHist is last 130 branch outcomes.
+//comp is index value in FoldedHistory. each branch has a comp computed for each bank (not the bimodal table/bank)
+//tag is used for identifying global history value associated to each entry.
+comp = (comp << 1) | h[0] // append current branch outcome to lsb of comp using binary 'or'.
+comp ^= h[origLength] << outpoint  // comp xor (hist left shifted to outpoint)
+comp ^= (comp >> compLength) // comp compressed to compLength and xored with itself.
+comp &= (ULL(1) << compLength) - 1 // comp and 511, whatever value is computed above is truncated to 511.
+#/update()
+
+Decode:
