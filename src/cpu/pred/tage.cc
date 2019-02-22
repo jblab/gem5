@@ -129,11 +129,14 @@ TAGE::TAGE(const TAGEParams *params)
 
     gtable = new TageEntry*[nHistoryTables + 1];
     for (int i = 1; i <= nHistoryTables; i++) {
-        gtable[i] = new TageEntry[1<<(logTagTableSizes[i])];
+        gtable[i] = new TageEntry[1<<(logTagTableSizes[i])]; // allocated new TageEntry array size 512 in each of 7 tables.
     }
 
     tableIndices = new int [nHistoryTables+1];
     tableTags = new int [nHistoryTables+1];
+
+    csv.open("branch_pc.csv");
+
 }
 
 int
@@ -323,6 +326,11 @@ TAGE::tagePredict(ThreadID tid, Addr branch_pc,
                 break;
             }
         }
+        /*bi->hitBank = setBasedHitBank;
+        if(lookupCnt%1232==0 && setBasedHitBank<nHistoryTables)
+            setBasedHitBank++;
+        //bi->hitBank = nHistoryTables;
+        bi->hitBankIndex = tableIndices[bi->hitBank];*/
         //Look for the alternate bank
         for (int i = bi->hitBank - 1; i > 0; i--) {
             if (gtable[i][tableIndices[i]].tag == tableTags[i]) {
@@ -331,6 +339,8 @@ TAGE::tagePredict(ThreadID tid, Addr branch_pc,
                 break;
             }
         }
+        /*bi->altBank = bi->hitBank - 1;
+        bi->altBankIndex = tableIndices[bi->altBank];*/
         //computes the prediction and the alternate prediction
         if (bi->hitBank > 0) {
             if (bi->altBank > 0) {
@@ -570,8 +580,13 @@ TAGE::lookup(ThreadID tid, Addr branch_pc, void* &bp_history)
 {
     bool retval = predict(tid, branch_pc, true, bp_history);
 
+
     DPRINTF(Tage, "Lookup branch: %lx; predict:%d\n", branch_pc, retval);
     updateHistories(tid, branch_pc, retval, bp_history);
+    lookupCnt++;
+    //std::cout << "Current lookup count: " << lookupCnt << "branchPC: " << branch_pc << std::endl;
+    csv << lookupCnt << "," << branch_pc << std::endl;
+    //DPRINTF(Tage, "Current lookup count: %d\n", lookupCnt);
     assert(threadHistory[tid].gHist ==
            &threadHistory[tid].globalHistory[threadHistory[tid].ptGhist]);
 

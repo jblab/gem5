@@ -56,6 +56,11 @@
 #include "base/types.hh"
 #include "cpu/pred/bpred_unit.hh"
 #include "params/TAGE.hh"
+#include <fstream>
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
 
 class TAGE: public BPredUnit
 {
@@ -107,8 +112,31 @@ class TAGE: public BPredUnit
         {
             comp = (comp << 1) | h[0];
             comp ^= h[origLength] << outpoint;
+            //comp ^= full_history_outpoint(h);
             comp ^= (comp >> compLength);
             comp &= (ULL(1) << compLength) - 1;
+        }
+
+        int full_history_outpoint(uint8_t * h)
+        {
+            //int h_len = sizeof(h)/sizeof(h[0]);
+            //std::cout << "Hist Length: " << h_len << std::endl;
+            int start = 0;
+            int end = 0;
+            if ( (origLength+63) < 130 ){
+                start = origLength;
+                end = origLength+63;
+            } else {
+                start = origLength-63;
+                end = origLength;
+            }
+            std::string bin_str("");
+            for(int i=start; i<=end; i++){
+                bin_str+=std::to_string(h[i]);
+            }
+            //std::cout << "binstr: " << bin_str << std::endl;
+            return (std::stoul(bin_str, nullptr, 2)%256);
+            //return (std::stoul(bin_str, nullptr, 2));
         }
     };
 
@@ -358,6 +386,9 @@ class TAGE: public BPredUnit
     std::vector<bool> btablePrediction;
     std::vector<bool> btableHysteresis;
     TageEntry **gtable;
+    uint lookupCnt=0;
+    uint setBasedHitBank=1;
+    ofstream csv;
 
     // Keep per-thread histories to
     // support SMT.

@@ -10,15 +10,14 @@ CorrBP::CorrBP(const CorrBPParams *params ):BPredUnit(params),
 InstShiftAmt(params->instShiftAmt)
 
 {
-
 // initialise history table and counter table
- for (int i=0; i<historyBits;i++)
+ for (uint i=0; i<historyBits;i++)
    {
 
     historytable[i]=0;
   }
 
-   for (int i=0; i<historyBits;i++)
+   for (uint i=0; i<historyBits;i++)
    {
 
     countertable[i]=0;

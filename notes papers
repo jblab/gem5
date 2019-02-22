@@ -21,7 +21,7 @@ iii) In case of no matching tagged predictor component, default prediction is us
 
 Updating useful counter u of the
 
-
+---------------------------------------------------------------------------------------------------------
 [1]: Michaud's PPM like tag-based BP:
 Design:
 ii) GPPM features 2 tables - A bimodal table and a global table.
@@ -43,3 +43,35 @@ Predictor Update:
 i) We know the prediction, from which bank was obtained, and whether the prediciton was correct or not. 
 ii) Update 3-bit counter. TBC.
 iii) If X<=3, and if the prediction was wrong, we allocate TBC
+---------------------------------------------------------------------------------------------------------
+Michaud Tage Theoretical analysis:
+Sequences are mapped onto table entries through hash functions.
+
+To compute a hash function, we are given:
+
+Predictor Info:
+
+Global history g
+
+Branch word address a
+
+Table entry size m
+
+Program Info:
+
+Program Control Flow (PCF) as a finite sequence of dynamic basic blocks Bᵢ ∈ β
+
+β is the set of all static basic blocks constituting the program text.
+
+PCF length N is large, ex- several hundreds of thousands of dynamic basic blocks.
+
+1ₛ most  frequent successor block of sequence s in PCF.
+0ₛ least frequent successor block of sequence s in PCF.
+In particular, for a block B,
+1\_B most  frequent successor of block B.
+0\_B least frequent successor of block B.
+
+
+Hash function folds a bit vector g onto m bits by a bitwise XOR or groups of m consecutive bits.
+
+Each bank has 2ᵐ⁻² entries and is indexed with H(s, m-2).

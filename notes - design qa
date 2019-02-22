@@ -9,5 +9,62 @@ Q: What's the difference between path history and global history?
 A: Path History is lsb of last 16 branch addresses.
 Global history keeps last 130 branch predictions.
 
-Q: What's the logic behind calculating index and tag?
+Q: Difference between lookup() and predict() ?
+A: lookup() calls predict()
+
+Q: What's the logic behind calculating index and tag? Why do we need to calculate both?
 A: 
+TAG is XOR of: (shiftedPC, comp_branch_history_1, comp_branch_history_2)
+Index is XOR of: (shiftedPC, moreShiftedPC, comp_branch_history, folded_path_history)
+
+Tag is what you calculate for given branch PC for each of the 7 banks.
+Gtable has 8X512 entries saves, each of them is identified by an index and contains a tag.
+We collect the prediction on tag match. So the question is, why do we need a tag match to get the prediction? Because:
+Removing the tags causes 2% reduction in %correct. So, the question is:
+Can we mathematically prove what caused this 2% reduction?
+
+
+
+Q: 
+a) Formula for/Relationship between: tag-width & %correctly-predicted?
+b) Formula for/Relationship between: tag-calculation & %correctly-predicted?
+c) Formula for/Relationship between: index-calculation & %correctly-predicted?
+d) Formula for/Relationship between: base-table-size-8192 & %correctly-predicted?
+e) Formula for/Relationship between: table-size-512 & %correctly-predicted?
+f) Formula for/Relationship between: geometric-history & %correctly-predicted?
+A: 
+a) table-width ∝ 1/tag-aliasing ∝ %correctly-predicted
+b) 
+c) 
+d) table-size ∝ %correctly-predicted 
+e) table-size ∝ %correctly-predicted
+f) 
+
+Q2: Why does CorrBP accuracy drops when historyBits/historyTable are changed from 536870912 to 65536?
+A2: 
+
+Q3: Why can max historyBits/historyTable size of CorrBP not exceed ~30 bits when there are 32 bits in 4 byte unsigned type whose value is 4294967295?
+A3: 
+
+--------------------------------------------------------------------
+Problem Drilldown:
+
+Problem 1:
+Prove that removing tags causes 2% reduction in accuracy.
+
+
+SubProblem A:
+By making this changes, we are using on bank (1X512) with longest history, instead of all 7 banks (7X512). 
+What's the optimal method to still use all 7 banks?
+We divide the number of branches by the number of banks - 1 (so we have 1st bank for making alternate prediction) and make the predictions for first set using bank 2 and last set from bank 7.
+We have 10,852 lookups for 'sort' load. This gives us, 7396/6 = 1232 lookups per set.
+
+Problem 2:
+Is it possible to reformulate the problem of finding history length and bank sizes as combinatorial optimization problems.
+
+Problem 3:
+Can the problem of answering whether to use tags or not be a decision problem?
+
+--------------------------------------------------------------------
+Current:
+Find nature of condPredicted/condIncorrect parameters and how they related to branch PC/predictor size?

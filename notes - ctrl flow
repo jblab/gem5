@@ -42,7 +42,7 @@ Progress:
 
 
 Intel PIN
-i) Correlate input program bianary to branch prediction.
+i) Correlate input program binary to branch prediction.
 
 Running:
 pin -t obj-intel64/branch_predictor.dylib -- ~/Documents/code/c_cpp/a.out

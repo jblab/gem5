@@ -66,13 +66,19 @@ private:
     };
 
 //unsigned historyBits = 16;
-const static unsigned historyBits = 4294967295;
-unsigned historytable[historyBits];
-unsigned countertable[historyBits];
+//const static unsigned long int historyBits = 536870912;
+//unsigned historyBits = 65536;
+unsigned historyBits = 1;
+//unsigned historyBits =  4294967295;
+unsigned* historytable = new unsigned[historyBits];
+unsigned* countertable = new unsigned[historyBits];
+//unsigned historytable[historyBits];
+//unsigned countertable[historyBits];
+//unsigned index;
 unsigned local_pred;
 unsigned global_pred;
 unsigned InstShiftAmt;
-unsigned index;
+unsigned long int index;
 unsigned count;
 unsigned branch_lower_order;
 
